@@ -4,6 +4,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/Header";
 import ClientProvider from "@/components/ClerkProvider";
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { ourFileRouter } from "./api/uploadthing/core";
+import { extractRouterConfig } from "uploadthing/server";
 
 const montserrat = Montserrat({ 
   subsets: ["latin"],
@@ -52,6 +55,10 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`${montserrat.variable} ${openSans.variable} font-sans`}>
+        <NextSSRPlugin 
+        
+        routerConfig={extractRouterConfig(ourFileRouter)}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
