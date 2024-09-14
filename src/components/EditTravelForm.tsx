@@ -23,6 +23,7 @@ import { SubmitButton } from "./SubmitButtons";
 import { travelPackageSchema } from "@/lib/zodSchema";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { Decimal, JsonValue } from "@prisma/client/runtime/library";
+
 import { editPackage } from "@/action";
 
 interface EditTravelFormProps {
@@ -42,30 +43,19 @@ interface EditTravelFormProps {
   }
 export function EditForm({ data }: EditTravelFormProps) {
     const [images, setImages] = useState<string[]>(data.images);
-    const [dailyDetails, setDailyDetails] = useState<string[]>(
-      data.dailyDetails as string[],
-    );
-    const [lastResult, action] = useFormState(editPackage, undefined);
-
-  const [form, fields] = useForm({
-    lastResult,
-    onValidate({ formData }) {
-      return parseWithZod(formData, { schema: travelPackageSchema });
-    },
-    shouldValidate: "onBlur",
-    shouldRevalidate: "onInput",
-    defaultValue: {
-      id: data.id,
-      name: data.name,
-      durationInDays: data.durationInDays.toString(),
-      departureCity: data.departureCity,
-      arrivalCity: data.arrivalCity,
-      price: data.price.toString(),
-      overview: data.overview,
-      images: data.images,
-      dailyDetails: data.dailyDetails,
-    },
-  });
+    const [dailyDetails, setDailyDetails] = useState<string[]>(data.dailyDetails as string[]);
+    const [lastResult, action] = useFormState(editPackage, null);
+  
+    const [form, fields] = useForm({
+      lastResult,
+      onValidate({ formData }) {
+        console.log(formData + "onvalidate")
+        return parseWithZod(formData, { schema: travelPackageSchema });
+      },
+      
+      shouldValidate: "onBlur",
+      shouldRevalidate: "onInput",
+    });
 
   useEffect(() => {
     const durationValue = parseInt(fields.durationInDays.value || "1", 10);
@@ -94,7 +84,7 @@ export function EditForm({ data }: EditTravelFormProps) {
 
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
-      <input type="hidden" name="id" value={data.id} />
+        <input type="hidden" name="packageId" value={data.id} />
       <div className="flex items-center gap-x-4 mb-6">
         <Button variant="outline" size="icon" asChild>
           <Link href="/dashboard/packages">

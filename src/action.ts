@@ -7,8 +7,9 @@ import prisma from "./lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
 import { travelPackageSchema } from "../src/lib/zodSchema";
+
 import { Decimal } from "@prisma/client/runtime/library";
-import { z } from "zod";
+
 
 
  const deleteUTFiles = async (files: string[]) => {
@@ -128,29 +129,31 @@ export async function deleteTravelPackage(formData: FormData) {
     },
   });
 
-  // await deleteUTFiles(travelPackage.imageStrings);
+
 
   redirect("/dashboard/packages");
 }
 
 
+
+
+
 export async function editPackage(prevState: unknown, formData: FormData) {
   const user = await currentUser()
   if (!user ) throw new Error("Unauthorized");
- 
   if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
 
   const submission = parseWithZod(formData, {
-    schema: travelPackageSchema.extend({
-      id: z.string(),
-    }),
+    schema:travelPackageSchema,
   });
 
   if (submission.status !== "success") {
     return submission.reply();
   }
 
-  const { id, ...updateData } = submission.value;
+  const packageId = formData.get("productId") as string;
+
+  const { ...updateData } = submission.value;
 
   const flattenUrls = updateData.images.flatMap((urlString) =>
     urlString.split(",").map((url) => url.trim())
@@ -160,7 +163,7 @@ export async function editPackage(prevState: unknown, formData: FormData) {
 
   try {
     await prisma.travelPackage.update({
-      where: { id },
+      where: { id: packageId },
       data: {
         ...updateData,
         images: flattenUrls,
@@ -169,11 +172,17 @@ export async function editPackage(prevState: unknown, formData: FormData) {
       },
     });
   } catch (error) {
-    return { error: "Failed to update travel package" };
+    return { error: { "": ["Failed to update travel package"] } };
   }
 
   redirect("/dashboard/packages");
 }
 
+
+
+
+
+
+  
 
 
