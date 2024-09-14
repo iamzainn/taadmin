@@ -16,3 +16,18 @@ model Banner {
 }
 
 
+model TravelPackage {
+  id             String   @id @default(cuid())
+  name           String
+  durationInDays Int
+  departureCity  String
+  arrivalCity    String
+  price              Decimal  @db.Decimal(10, 2)
+  images      String[]
+  dailyDetails   Json     @default("[]") // Array of daily activities
+  overview       String   @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+

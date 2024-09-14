@@ -7,9 +7,7 @@ import ClientProvider from "@/components/ClerkProvider";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
 import { ourFileRouter } from "./api/uploadthing/core";
 import { extractRouterConfig } from "uploadthing/server";
-import dynamic from "next/dynamic";
 
-// const ChatBot = dynamic(() => import('@/components/Chatbot'), { ssr: false });
 const montserrat = Montserrat({ 
   subsets: ["latin"],
   variable: "--font-montserrat",
@@ -68,14 +66,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          <main className="pt-16"> {/* Add padding-top to account for fixed header */}
+          <main className="pt-16"> 
             {children}
            
           </main>
           <footer>
          
           </footer>
-          {/* <ChatBot/> */}
+          
          
         </ThemeProvider>
       </body>

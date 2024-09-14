@@ -6,6 +6,7 @@ import {  bannerSchema} from "../src/lib/zodSchema";
 import prisma from "./lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
+import { travelPackageSchema } from "../src/lib/zodSchema";
 
 
  const deleteUTFiles = async (files: string[]) => {
@@ -65,3 +66,64 @@ export async function createBanner(prevState: unknown, formData: FormData) {
   
     redirect("/dashboard/banner");
   }
+
+
+
+
+
+export async function createTravelPackage(prevState: unknown, formData: FormData) {
+  const user = await currentUser();
+  if (!user) throw new Error("Unauthorized");
+  if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
+
+  const submission = parseWithZod(formData, {
+    schema: travelPackageSchema,
+  });
+
+  if (submission.status !== "success") {
+    return submission.reply();
+  }
+
+  const flattenUrls = submission.value.images.flatMap((urlString) =>
+    urlString.split(",").map((url) => url.trim())
+  );
+
+  await prisma.travelPackage.create({
+    data: {
+      name: submission.value.name,
+      durationInDays: submission.value.durationInDays,
+      departureCity: submission.value.departureCity,
+      arrivalCity: submission.value.arrivalCity,
+      // dailyDetails: submission.value.dailyDetails,
+      overview: submission.value.overview,
+      images: flattenUrls,
+      price: submission.value.price,
+    },
+  });
+
+  redirect("/dashboard/travel-packages");
+}
+
+export async function deleteTravelPackage(formData: FormData) {
+  const user = await currentUser();
+  if (!user) throw new Error("Unauthorized");
+  if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
+
+  const packageId = formData.get("packageId") as string;
+
+  await prisma.travelPackage.delete({
+    where: {
+      id: packageId,
+    },
+  });
+
+   await prisma.travelPackage.delete({
+    where: {
+      id: packageId,
+    },
+  });
+
+  // await deleteUTFiles(travelPackage.imageStrings);
+
+  redirect("/dashboard/travel-packages");
+}
