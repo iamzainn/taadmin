@@ -87,7 +87,7 @@ export default async function PackagesRoute() {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/packages/${pkg.id}/edit`}>
+                          <Link href={`/dashboard/packages/${pkg.id}`}>
                             Edit
                           </Link>
                         </DropdownMenuItem>

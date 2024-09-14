@@ -1,5 +1,5 @@
 "use client";
-import { travelPackageSchema } from "@/lib/zodSchema";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,21 +12,40 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { UploadDropzone } from "@/lib/uploadthing";
-import { useForm } from "@conform-to/react";
-import { parseWithZod } from "@conform-to/zod";
 import { ChevronLeft, XIcon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
-import { SubmitButton } from "@/components/SubmitButtons";
-import { createTravelPackage } from "@/action";
+import { useForm } from "@conform-to/react";
+import { parseWithZod } from "@conform-to/zod";
+import { SubmitButton } from "./SubmitButtons";
+import { travelPackageSchema } from "@/lib/zodSchema";
+import { UploadDropzone } from "@/lib/uploadthing";
+import { Decimal, JsonValue } from "@prisma/client/runtime/library";
+import { editPackage } from "@/action";
 
-export default function CreateTravelPackagePage() {
-  const [images, setImages] = useState<string[]>([]);
-  const [dailyDetails, setDailyDetails] = useState<string[]>([""]);
-  const [lastResult, action] = useFormState(createTravelPackage, undefined);
+interface EditTravelFormProps {
+    data: {
+      id: string;
+      name: string;
+      durationInDays: number;
+      departureCity: string;
+      arrivalCity: string;
+      price: Decimal;
+      images: string[];
+      dailyDetails: JsonValue;
+      overview: string;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+  }
+export function EditForm({ data }: EditTravelFormProps) {
+    const [images, setImages] = useState<string[]>(data.images);
+    const [dailyDetails, setDailyDetails] = useState<string[]>(
+      data.dailyDetails as string[],
+    );
+    const [lastResult, action] = useFormState(editPackage, undefined);
 
   const [form, fields] = useForm({
     lastResult,
@@ -35,6 +54,17 @@ export default function CreateTravelPackagePage() {
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
+    defaultValue: {
+      id: data.id,
+      name: data.name,
+      durationInDays: data.durationInDays.toString(),
+      departureCity: data.departureCity,
+      arrivalCity: data.arrivalCity,
+      price: data.price.toString(),
+      overview: data.overview,
+      images: data.images,
+      dailyDetails: data.dailyDetails,
+    },
   });
 
   useEffect(() => {
@@ -64,19 +94,20 @@ export default function CreateTravelPackagePage() {
 
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
+      <input type="hidden" name="id" value={data.id} />
       <div className="flex items-center gap-x-4 mb-6">
         <Button variant="outline" size="icon" asChild>
           <Link href="/dashboard/packages">
             <ChevronLeft className="w-4 h-4" />
           </Link>
         </Button>
-        <h1 className="text-xl font-semibold tracking-tight">New Travel Package</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Edit Travel Package</h1>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Travel Package Details</CardTitle>
-          <CardDescription>Create your travel package here</CardDescription>
+          <CardDescription>Edit your travel package here</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col gap-3">
@@ -165,6 +196,7 @@ export default function CreateTravelPackagePage() {
               defaultValue={fields.price.initialValue}
               type="number"
               min="1"
+              step="0.01"
             />
             <p className="text-red-500">{fields.price.errors}</p>
           </div>
@@ -173,10 +205,8 @@ export default function CreateTravelPackagePage() {
             <Label>Images</Label>
             <input
               type="hidden"
-              value={images}
-              key={fields.images.key}
+              value={images.join(',')}
               name={fields.images.name}
-              defaultValue={fields.images.initialValue as undefined}
             />
             {images.length > 0 ? (
               <div className="flex gap-5">
@@ -214,7 +244,7 @@ export default function CreateTravelPackagePage() {
           </div>
         </CardContent>
         <CardFooter>
-          <SubmitButton text="Create Travel Package" />
+          <SubmitButton text="Update Travel Package" />
         </CardFooter>
       </Card>
     </form>
