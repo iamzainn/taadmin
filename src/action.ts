@@ -123,11 +123,7 @@ export async function deleteTravelPackage(formData: FormData) {
     },
   });
 
-   await prisma.travelPackage.delete({
-    where: {
-      id: packageId,
-    },
-  });
+  
 
 
 
@@ -139,6 +135,7 @@ export async function deleteTravelPackage(formData: FormData) {
 
 
 export async function editPackage(prevState: unknown, formData: FormData) {
+  // console.log("here");
   const user = await currentUser()
   if (!user ) throw new Error("Unauthorized");
   if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
@@ -151,7 +148,8 @@ export async function editPackage(prevState: unknown, formData: FormData) {
     return submission.reply();
   }
 
-  const packageId = formData.get("productId") as string;
+  const packageId = formData.get("packageId") as string;
+  
 
   const { ...updateData } = submission.value;
 

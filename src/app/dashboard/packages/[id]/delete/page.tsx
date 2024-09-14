@@ -28,7 +28,7 @@ export default function DeleteRoute({ params }: { params: { id: string } }) {
             <Link href="/dashboard/products">Cancel</Link>
           </Button>
           <form action={deleteTravelPackage}>
-            <input type="hidden" name="productId" value={params.id} />
+            <input type="hidden" name="packageId" value={params.id} />
             <SubmitButton variant="destructive" text="Delete Product" />
           </form>
         </CardFooter>

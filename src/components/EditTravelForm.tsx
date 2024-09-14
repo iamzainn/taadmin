@@ -52,9 +52,18 @@ export function EditForm({ data }: EditTravelFormProps) {
         console.log(formData + "onvalidate")
         return parseWithZod(formData, { schema: travelPackageSchema });
       },
+
       
       shouldValidate: "onBlur",
       shouldRevalidate: "onInput",
+      defaultValue: {
+        name: data.name,
+        durationInDays: data.durationInDays.toString(),
+        departureCity: data.departureCity,
+        arrivalCity: data.arrivalCity,
+        price: data.price.toString(),
+        overview: data.overview,    
+      },
     });
 
   useEffect(() => {
