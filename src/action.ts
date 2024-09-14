@@ -71,39 +71,42 @@ export async function createBanner(prevState: unknown, formData: FormData) {
 
 
 
-export async function createTravelPackage(prevState: unknown, formData: FormData) {
-  const user = await currentUser();
-  if (!user) throw new Error("Unauthorized");
-  if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
+  export async function createTravelPackage(prevState: unknown, formData: FormData) {
+    const user = await currentUser()
+    if (!user ) throw new Error("Unauthorized");
+   
+    if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
 
-  const submission = parseWithZod(formData, {
-    schema: travelPackageSchema,
-  });
 
-  if (submission.status !== "success") {
-    return submission.reply();
-  }
 
-  const flattenUrls = submission.value.images.flatMap((urlString) =>
-    urlString.split(",").map((url) => url.trim())
-  );
+const submission = parseWithZod(formData, {
+  schema: travelPackageSchema,
+});
 
-  await prisma.travelPackage.create({
-    data: {
-      name: submission.value.name,
-      durationInDays: submission.value.durationInDays,
-      departureCity: submission.value.departureCity,
-      arrivalCity: submission.value.arrivalCity,
-      // dailyDetails: submission.value.dailyDetails,
-      overview: submission.value.overview,
-      images: flattenUrls,
-      price: submission.value.price,
-    },
-  });
-
-  redirect("/dashboard/travel-packages");
+if (submission.status !== "success") {
+  return submission.reply();
 }
-
+    const flattenUrls = submission.value.images.flatMap((urlString) =>
+      urlString.split(",").map((url) => url.trim())
+    );
+  
+    const dailyDetails = JSON.parse(formData.get("dailyDetails") as string);
+  
+    await prisma.travelPackage.create({
+      data: {
+        name: submission.value.name,
+        durationInDays: submission.value.durationInDays,
+        departureCity: submission.value.departureCity,
+        arrivalCity: submission.value.arrivalCity,
+        dailyDetails: dailyDetails,
+        overview: submission.value.overview,
+        images: flattenUrls,
+        price: submission.value.price,
+      },
+    });
+  
+    redirect("/dashboard/packages");
+  }
 export async function deleteTravelPackage(formData: FormData) {
   const user = await currentUser();
   if (!user) throw new Error("Unauthorized");

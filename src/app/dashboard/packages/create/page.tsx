@@ -1,7 +1,6 @@
 "use client";
 
 import { travelPackageSchema } from "@/lib/zodSchema";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,16 +16,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { ChevronLeft, Plus, Minus, XIcon } from "lucide-react";
+import { ChevronLeft, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 import { SubmitButton } from "@/components/SubmitButtons";
 import { createTravelPackage } from "@/action";
 
 export default function CreateTravelPackagePage() {
-  const [images, setImages] = useState<string[]>([""]);
+  const [images, setImages] = useState<string[]>([]);
+  const [dailyDetails, setDailyDetails] = useState<string[]>([""]);
   const [lastResult, action] = useFormState(createTravelPackage, undefined);
 
   const [form, fields] = useForm({
@@ -38,7 +38,26 @@ export default function CreateTravelPackagePage() {
     shouldRevalidate: "onInput",
   });
 
- 
+  useEffect(() => {
+    const durationValue = parseInt(fields.durationInDays.value || "1", 10);
+    setDailyDetails(prevDetails => {
+      const newDetails = [...prevDetails];
+      if (durationValue > newDetails.length) {
+        return [...newDetails, ...Array(durationValue - newDetails.length).fill("")];
+      } else if (durationValue < newDetails.length) {
+        return newDetails.slice(0, durationValue);
+      }
+      return newDetails;
+    });
+  }, [fields.durationInDays.value]);
+
+  const handleDailyDetailChange = (index: number, value: string) => {
+    setDailyDetails(prevDetails => {
+      const newDetails = [...prevDetails];
+      newDetails[index] = value;
+      return newDetails;
+    });
+  };
 
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
@@ -108,32 +127,23 @@ export default function CreateTravelPackagePage() {
 
           <div className="flex flex-col gap-3">
             <Label>Daily Details</Label>
-            {fields.dailyDetails.getFieldList().map((field, index) => (
-              <div key={field.key} className="flex items-center gap-2">
+            {dailyDetails.map((detail, index) => (
+              <div key={index} className="flex flex-col gap-2">
+                <Label htmlFor={`daily-detail-${index}`}>Day {index + 1}</Label>
                 <Textarea
-                  name={field.name}
-                  defaultValue={field.initialValue}
+                  id={`daily-detail-${index}`}
+                  name={`${fields.dailyDetails.name}[${index}]`}
+                  value={detail}
+                  onChange={(e) => handleDailyDetailChange(index, e.target.value)}
                   placeholder={`Enter details for day ${index + 1}`}
                 />
-                {index > 0 && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => {}}
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                )}
               </div>
             ))}
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {}}
-            >
-              <Plus className="w-4 h-4 mr-2" /> Add Day
-            </Button>
+            <input
+              type="hidden"
+              name={fields.dailyDetails.name}
+              value={JSON.stringify(dailyDetails)}
+            />
             <p className="text-red-500">{fields.dailyDetails.errors}</p>
           </div>
 
@@ -156,55 +166,53 @@ export default function CreateTravelPackagePage() {
               defaultValue={fields.price.initialValue}
               type="number"
               min="1"
-              />
+            />
             <p className="text-red-500">{fields.price.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">
-              <Label>Images</Label>
-              <input
-                type="hidden"
-                value={images}
-                key={fields.images.key}
-                name={fields.images.name}
-                defaultValue={fields.images.initialValue as undefined}
+            <Label>Images</Label>
+            <input
+              type="hidden"
+              value={images}
+              key={fields.images.key}
+              name={fields.images.name}
+              defaultValue={fields.images.initialValue as undefined}
+            />
+            {images.length > 0 ? (
+              <div className="flex gap-5">
+                {images.map((image, index) => (
+                  <div key={index} className="relative w-[100px] h-[100px]">
+                    <Image
+                      height={100}
+                      width={100}
+                      src={image}
+                      alt="Product Image"
+                      className="w-full h-full object-cover rounded-lg border"
+                    />
+                    <button
+                      onClick={() => handleDelete(index)}
+                      type="button"
+                      className="absolute -top-3 -right-3 bg-red-500 p-2 rounded-lg text-white"
+                    >
+                      <XIcon className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <UploadDropzone
+                endpoint="packageImageRoute"
+                onClientUploadComplete={(res) => {
+                  setImages(res.map((r) => r.url));
+                }}
+                onUploadError={() => {
+                  alert("Something went wrong");
+                }}
               />
-              {images.length > 0 ? (
-                <div className="flex gap-5">
-                  {images.map((image, index) => (
-                    <div key={index} className="relative w-[100px] h-[100px]">
-                      <Image
-                        height={100}
-                        width={100}
-                        src={image}
-                        alt="Product Image"
-                        className="w-full h-full object-cover rounded-lg border"
-                      />
-
-                      <button
-                        onClick={() => handleDelete(index)}
-                        type="button"
-                        className="absolute -top-3 -right-3 bg-red-500 p-2 rounded-lg text-white"
-                      >
-                        <XIcon className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <UploadDropzone
-                  endpoint="packageImageRoute"
-                  onClientUploadComplete={(res) => {
-                    setImages(res.map((r) => r.url));
-                  }}
-                  onUploadError={() => {
-                    alert("Something went wrong");
-                  }}
-                />
-              )}
-
-              <p className="text-red-500">{fields.images.errors}</p>
-            </div>
+            )}
+            <p className="text-red-500">{fields.images.errors}</p>
+          </div>
         </CardContent>
         <CardFooter>
           <SubmitButton text="Create Travel Package" />
