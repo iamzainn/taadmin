@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Montserrat, Open_Sans } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+
 import Header from "@/components/Header";
 import ClientProvider from "@/components/ClerkProvider";
 import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
@@ -59,12 +59,7 @@ export default function RootLayout({
         
         routerConfig={extractRouterConfig(ourFileRouter)}
         />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+       
           <Header />
           <main className="pt-16"> 
             {children}
@@ -75,7 +70,7 @@ export default function RootLayout({
           </footer>
           
          
-        </ThemeProvider>
+      
       </body>
     </html>
     </ClientProvider>

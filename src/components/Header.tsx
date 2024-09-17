@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Auth from './AdminAuth'
-import { ModeToggle } from './ToggleMode'
+
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -25,7 +25,7 @@ const Header: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          {/* Logo */}
+         
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <span className="hidden md:flex text-xl font-bold text-primary dark:text-white">
@@ -36,7 +36,7 @@ const Header: React.FC = () => {
 
          
           <div className="flex items-center space-x-4">
-            <ModeToggle />
+            
             <Auth />
           </div>
         </div>

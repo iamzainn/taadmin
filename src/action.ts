@@ -8,10 +8,6 @@ import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
 import { travelPackageSchema } from "../src/lib/zodSchema";
 
-import { Decimal } from "@prisma/client/runtime/library";
-
-
-
  const deleteUTFiles = async (files: string[]) => {
   const utapi = new UTApi();
   try {
@@ -20,7 +16,6 @@ import { Decimal } from "@prisma/client/runtime/library";
     console.error("UTAPI: Error deleting files", error);
   }
 };
-
 
 
 export async function createBanner(prevState: unknown, formData: FormData) {
@@ -44,6 +39,8 @@ export async function createBanner(prevState: unknown, formData: FormData) {
       data: {
         title: submission.value.title,
         imageString: submission.value.imageString,
+        subtitle: submission.value.subtitle,
+        
       },
     });
   
@@ -71,16 +68,11 @@ export async function createBanner(prevState: unknown, formData: FormData) {
   }
 
 
-
-
-
   export async function createTravelPackage(prevState: unknown, formData: FormData) {
     const user = await currentUser()
     if (!user ) throw new Error("Unauthorized");
    
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
-
-
 
 const submission = parseWithZod(formData, {
   schema: travelPackageSchema,
@@ -124,18 +116,11 @@ export async function deleteTravelPackage(formData: FormData) {
   });
 
   
-
-
-
   redirect("/dashboard/packages");
 }
 
-
-
-
-
 export async function editPackage(prevState: unknown, formData: FormData) {
-  // console.log("here");
+  
   const user = await currentUser()
   if (!user ) throw new Error("Unauthorized");
   if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
@@ -166,7 +151,7 @@ export async function editPackage(prevState: unknown, formData: FormData) {
         ...updateData,
         images: flattenUrls,
         dailyDetails,
-        price: new Decimal(updateData.price),
+        price:(updateData.price),
       },
     });
   } catch (error) {

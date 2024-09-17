@@ -10,8 +10,8 @@ const links = [
     href: "/dashboard",
   },
   {
-    name: "Requests",
-    href: "/dashboard/requests",
+    name: "orders",
+    href: "/dashboard/orders",
   },
   {
     name: "Packages",

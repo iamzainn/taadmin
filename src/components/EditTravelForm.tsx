@@ -22,7 +22,7 @@ import { parseWithZod } from "@conform-to/zod";
 import { SubmitButton } from "./SubmitButtons";
 import { travelPackageSchema } from "@/lib/zodSchema";
 import { UploadDropzone } from "@/lib/uploadthing";
-import { Decimal, JsonValue } from "@prisma/client/runtime/library";
+import {JsonValue } from "@prisma/client/runtime/library";
 
 import { editPackage } from "@/action";
 
@@ -33,7 +33,7 @@ interface EditTravelFormProps {
       durationInDays: number;
       departureCity: string;
       arrivalCity: string;
-      price: Decimal;
+      price: bigint;
       images: string[];
       dailyDetails: JsonValue;
       overview: string;

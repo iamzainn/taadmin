@@ -202,6 +202,8 @@ export default function CreateTravelPackagePage() {
             ) : (
               <UploadDropzone
                 endpoint="packageImageRoute"
+                className="object-cover border rounded-lg bg-gray-600 flex items-center justify-center"
+
                 onClientUploadComplete={(res) => {
                   setImages(res.map((r) => r.url));
                 }}

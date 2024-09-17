@@ -58,7 +58,7 @@ export default function BannerRoute() {
         <CardContent>
           <div className="flex flex-col gap-y-6">
             <div className="flex flex-col gap-3">
-              <Label>Name</Label>
+              <Label>Title</Label>
               <Input
                 name={fields.title.name}
                 key={fields.title.key}
@@ -67,6 +67,18 @@ export default function BannerRoute() {
                 placeholder="Create title for Banner"
               />
               <p className="text-red-500">{fields.title.errors}</p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Label>Sub Title</Label>
+              <Input
+                name={fields.subtitle.name}
+                key={fields.subtitle.key}
+                defaultValue={fields.subtitle.initialValue}
+                type="text"
+                placeholder="Create Subtitle for Banner"
+              />
+              <p className="text-red-500">{fields.subtitle.errors}</p>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -88,6 +100,7 @@ export default function BannerRoute() {
                 />
               ) : (
                 <UploadDropzone
+                className="object-cover border rounded-lg bg-gray-600 flex items-center justify-center"
                   onClientUploadComplete={(res) => {
                     setImages(res[0].url);
                   }}

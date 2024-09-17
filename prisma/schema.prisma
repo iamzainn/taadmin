@@ -8,26 +8,62 @@ datasource db {
 }
 
 model Banner {
-  id          String @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
   imageString String
-  createdAt DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ctaText     String?
+  subtitle    String?
 }
-
 
 model TravelPackage {
-  id             String   @id @default(cuid())
-  name           String
-  durationInDays Int
-  departureCity  String
-  arrivalCity    String
-  price              Decimal  @db.Decimal(10, 2)
-  images      String[]
-  dailyDetails   Json     @default("[]") // Array of daily activities
-  overview       String   @db.Text
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                  String                @id @default(cuid())
+  name                String
+  price               BigInt
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  arrivalCity         String
+  dailyDetails        Json                  @default("[]")
+  departureCity       String
+  durationInDays      Int
+  overview            String
+  images              String[]
+  PackageSubscription PackageSubscription[]
 }
 
+model PackageSubscription {
+  id            String        @id
+  firstName     String
+  lastName      String
+  email         String
+  phoneNumber   String
+  country       String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime
+  packageId     String
+  TravelPackage TravelPackage @relation(fields: [packageId], references: [id])
+}
 
+model TravelCustomBooking {
+  id              String   @id
+  firstName       String
+  lastName        String
+  email           String
+  phoneNumber     String
+  country         String
+  pickUpLocation  String
+  Destination     String
+  travelStartDate DateTime
+  travelEndDate   DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+}
+
+model Countries {
+  id          String   @id
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  imageString String
+}

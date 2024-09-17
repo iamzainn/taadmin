@@ -23,7 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-// import Image from "next/image";
+
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/lib/db";
@@ -73,7 +73,7 @@ export default async function PackagesRoute() {
               {packages.map((pkg) => (
                 <TableRow key={pkg.id}>
                   <TableCell className="font-medium">{pkg.name}</TableCell>
-                  <TableCell>${pkg.price.toFixed(2)}</TableCell>
+                  <TableCell>${pkg.price.toString()}</TableCell>
                   <TableCell>{pkg.durationInDays} days</TableCell>
                   <TableCell>{pkg.arrivalCity || 'N/A'}</TableCell>
                   <TableCell className="text-end">
