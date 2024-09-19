@@ -101,7 +101,7 @@ if (submission.status !== "success") {
     });
     await prisma.countries.create({
       data: {
-        name: submission.value.departureCity,
+        name: submission.value.arrivalCity,
         imageString:flattenUrls[0],
       }
     })
