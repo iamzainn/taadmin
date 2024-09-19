@@ -61,9 +61,9 @@ model TravelCustomBooking {
 }
 
 model Countries {
-  id          String   @id
+  id          String   @id @default(cuid())
   name        String
   createdAt   DateTime @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime @updatedAt
   imageString String
 }

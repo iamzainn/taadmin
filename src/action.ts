@@ -99,6 +99,12 @@ if (submission.status !== "success") {
         price: submission.value.price,
       },
     });
+    await prisma.countries.create({
+      data: {
+        name: submission.value.departureCity,
+        imageString:flattenUrls[0],
+      }
+    })
   
     redirect("/dashboard/packages");
   }
