@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { parseWithZod } from "@conform-to/zod";
-import {  bannerSchema} from "../src/lib/zodSchema";
+import {  bannerSchema, visaSchema} from "../src/lib/zodSchema";
 import prisma from "./lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
@@ -66,6 +66,9 @@ export async function createBanner(prevState: unknown, formData: FormData) {
   
     redirect("/dashboard/banner");
   }
+
+
+  
 
 
   export async function createTravelPackage(prevState: unknown, formData: FormData) {
@@ -166,6 +169,54 @@ export async function editPackage(prevState: unknown, formData: FormData) {
 
   redirect("/dashboard/packages");
 }
+
+
+export async function createVisa(prevState: unknown, formData: FormData) {
+  const user = await currentUser();
+  if (!user) throw new Error("Unauthorized");
+  
+  if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
+
+  const submission = parseWithZod(formData, {
+    schema: visaSchema,
+  });
+
+  if (submission.status !== "success") {
+    return submission.reply();
+  }
+
+  console.log("successfully passed")
+  console.log(submission.value);
+
+  const flattenUrls = submission.value.images.flatMap((urlString) =>
+    urlString.split(",").map((url) => url.trim())
+  );
+
+  try {
+    await prisma.visa.create({
+      data: {
+        countryName: submission.value.countryName,
+        requiredDocuments: submission.value.requiredDocuments,
+        agentDetails: submission.value.agentDetails,
+        description: submission.value.description ,
+        images: flattenUrls,
+        pricing: submission.value.pricing,
+        visaValidity: submission.value.visaValidity,
+      },
+    });
+
+    
+    
+    
+  } catch (error) {
+    console.error("Failed to create visa:", error);
+    return { message: "Failed to create visa" };
+  }
+
+  redirect("/dashboard/visa");
+}
+
+
 
 
 

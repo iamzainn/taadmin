@@ -17,6 +17,8 @@ model Banner {
   subtitle    String?
 }
 
+
+
 model TravelPackage {
   id                  String                @id @default(cuid())
   name                String
@@ -66,4 +68,17 @@ model Countries {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   imageString String
+}
+
+model Visa {
+  id                String   @id @default(cuid())
+  countryName       String
+  requiredDocuments String
+  agentDetails      String
+  description       String
+  images            String[]
+  pricing           Int
+  visaValidity      Int
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
