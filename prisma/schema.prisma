@@ -17,8 +17,6 @@ model Banner {
   subtitle    String?
 }
 
-
-
 model TravelPackage {
   id                  String                @id @default(cuid())
   name                String
@@ -73,12 +71,21 @@ model Countries {
 model Visa {
   id                String   @id @default(cuid())
   countryName       String
-  requiredDocuments String
-  agentDetails      String
-  description       String
   images            String[]
-  pricing           Int
-  visaValidity      Int
-  createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+  createdAt         DateTime @default(now())
+  description       String
+  pricing           Int
+  requiredDocuments String
+  visaValidity      Int
+  agentId           String
+  Agent             Agent    @relation(fields: [agentId], references: [id])
+}
+
+model Agent {
+  id    String @id
+  name  String
+  phone String
+  email String @unique
+  Visa  Visa[]
 }

@@ -21,40 +21,82 @@ import { ChevronLeft, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { createVisa } from "@/action";
+
 import { useFormState } from "react-dom";
+import { deleteImage, editVisa } from "@/action";
 
-export default function VisaCreateRoute() {
-  const [images, setImages] = useState<string[]>([]);
-  const [, action] = useFormState(createVisa, undefined);
+interface VisaEditFormProps {
+    data:{
+      id: string;
+      agentName: string;
+      agentEmail: string;
+      agentId: string;
+      agentPhone: string;
+      countryName: string;
+      description: string;
+      pricing: number;
+      requiredDocuments: string;
+      visaValidity: number;
+      images: string[];
 
-  const [form, fields] = useForm({
+      
+    }
+}
+
+
+export default function VisaEditForm({data}: VisaEditFormProps) {
+  const [images, setImages] = useState<string[]>(data.images)
+
+  const [, action] = useFormState(editVisa, undefined);
+
+
+const [form, fields] = useForm({
+    lastResult: null,
     onValidate({ formData }) {
+      console.log(formData + "onvalidate")
       return parseWithZod(formData, { schema: visaSchema });
     },
+
+    
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
+    defaultValue: {
+        countryName: data.countryName,
+        description: data.description,
+        pricing: data.pricing.toString(),
+        requiredDocuments: data.requiredDocuments,
+        visaValidity: data.visaValidity.toString(),
+        agentPhone: data.agentPhone,
+        agentEmail: data.agentEmail,
+        agentName: data.agentName,
+    },
   });
 
-  const handleDelete = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
+  const handleDelete = async (imageUrl: string) => {
+   const result= await deleteImage(imageUrl)
+
+    if (result.status === "success") {
+      setImages((prev) => prev.filter((url) => url !== imageUrl));
+    }
+  
   };
 
   return (
-    <form id={form.id} onSubmit={form.onSubmit} action={action}>
+    <form id={form.id} onSubmit={form.onSubmit} action={action} >
+       <input type="hidden" name="visaId" value={data.id} />
       <div className="flex items-center gap-x-4">
         <Button variant="outline" size="icon" asChild>
           <Link href="/dashboard/visa">
             <ChevronLeft className="w-4 h-4" />
           </Link>
         </Button>
-        <h1 className="text-xl font-semibold tracking-tight">New Visa</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Edit Visa</h1>
       </div>
 
       <Card className="mt-5">
         <CardHeader>
           <CardTitle>Visa Details</CardTitle>
-          <CardDescription>Create a new visa entry</CardDescription>
+          <CardDescription>Edit visa entry</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-y-6">
@@ -192,7 +234,7 @@ export default function VisaCreateRoute() {
                         className="w-full h-full object-cover rounded-lg border"
                       />
                       <button
-                        onClick={() => handleDelete(index)}
+                        onClick={() => handleDelete(image)}
                         type="button"
                         className="absolute -top-3 -right-3 bg-red-500 p-2 rounded-lg text-white"
                       >
@@ -218,9 +260,11 @@ export default function VisaCreateRoute() {
           </div>
         </CardContent>
         <CardFooter>
-          <SubmitButton text="Create Visa" />
+          <SubmitButton text="Update Visa" />
         </CardFooter>
       </Card>
     </form>
   );
 }
+
+

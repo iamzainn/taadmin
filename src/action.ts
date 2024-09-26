@@ -8,14 +8,9 @@ import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
 import { travelPackageSchema } from "../src/lib/zodSchema";
 
- const deleteUTFiles = async (files: string[]) => {
-  const utapi = new UTApi();
-  try {
-    await utapi.deleteFiles(files);
-  } catch (error) {
-    console.error("UTAPI: Error deleting files", error);
-  }
-};
+const utapi = new UTApi();
+
+
 
 
 export async function createBanner(prevState: unknown, formData: FormData) {
@@ -62,7 +57,7 @@ export async function createBanner(prevState: unknown, formData: FormData) {
 
     });
     console.log(formData.get("bannerId"))
-    await deleteUTFiles([formData.get("bannerId") as string]);
+    // await deleteUTFiles([formData.get("bannerId") as string]);
   
     redirect("/dashboard/banner");
   }
@@ -185,29 +180,40 @@ export async function createVisa(prevState: unknown, formData: FormData) {
     return submission.reply();
   }
 
-  console.log("successfully passed")
-  console.log(submission.value);
-
   const flattenUrls = submission.value.images.flatMap((urlString) =>
     urlString.split(",").map((url) => url.trim())
   );
 
   try {
-    await prisma.visa.create({
-      data: {
-        countryName: submission.value.countryName,
-        requiredDocuments: submission.value.requiredDocuments,
-        agentDetails: submission.value.agentDetails,
-        description: submission.value.description ,
-        images: flattenUrls,
-        pricing: submission.value.pricing,
-        visaValidity: submission.value.visaValidity,
-      },
-    });
+    await prisma.$transaction(async (tx) => {
+      // Create or update the agent
+      const agent = await tx.agent.upsert({
+        where: { email: submission.value.agentEmail },
+        update: {
+          name: submission.value.agentName,
+          phone: submission.value.agentPhone,
+        },
+        create: {
+          id: `agent_${Date.now()}`, // Generate a unique ID
+          name: submission.value.agentName,
+          phone: submission.value.agentPhone,
+          email: submission.value.agentEmail,
+        },
+      });
 
-    
-    
-    
+      // Create the visa and associate it with the agent
+      await tx.visa.create({
+        data: {
+          countryName: submission.value.countryName,
+          requiredDocuments: submission.value.requiredDocuments,
+          description: submission.value.description,
+          images: flattenUrls,
+          pricing: submission.value.pricing,
+          visaValidity: submission.value.visaValidity,
+          agentId: agent.id,
+        },
+      });
+    });
   } catch (error) {
     console.error("Failed to create visa:", error);
     return { message: "Failed to create visa" };
@@ -215,6 +221,99 @@ export async function createVisa(prevState: unknown, formData: FormData) {
 
   redirect("/dashboard/visa");
 }
+
+export async function editVisa (prevState: unknown, formData: FormData) {
+  const user = await currentUser();
+  if (!user) throw new Error("Unauthorized");
+  
+  if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
+
+  const submission = parseWithZod(formData, {
+    schema: visaSchema,
+  }); 
+
+  if (submission.status !== "success") {
+    return submission.reply();
+  }
+
+
+
+  const visaId = formData.get("visaId") as string;
+ 
+  const { agentName, agentPhone, agentEmail, ...visaData } = submission.value;
+
+  try {
+    await prisma.$transaction(async (tx) => {
+     
+      const agent = await tx.agent.update({
+        where: { email: agentEmail },
+        data: {
+          name: agentName,
+          phone: agentPhone,
+        }
+      });
+      await tx.visa.update({
+        where: { id: visaId },
+        data: {
+          ...visaData,
+          
+          agentId: agent.id,
+        },
+      });
+    });
+
+   
+  } catch (error) {
+    console.error("Failed to update visa:", error);
+    return { status: "error", message: "Failed to update visa" };
+  }
+  redirect("/dashboard/visa");
+  
+
+  } 
+
+
+  export async function deleteImage(imageUrl:string) {
+  
+    if (!imageUrl) {
+      return { status: "error", message: "Missing required data" };
+    }
+    try {
+      const fileKey = imageUrl.split('/').pop();
+      if (!fileKey) {
+        throw new Error("Invalid image URL");
+      }
+      await utapi.deleteFiles([fileKey]);
+      return { status: "success", message: "Image deleted successfully" };
+    } catch (error) {
+      console.error("Failed to delete image:", error);
+      return { status: "error", message: "Failed to delete image" };
+    }
+  }
+
+  export async function deleteVisa(formData: FormData) {
+    const user = await currentUser();
+    if (!user) throw new Error("Unauthorized");
+    if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
+  
+    const visaId = formData.get("visaId") as string;
+    const images=formData.get("images") as string;
+    const arrayImages = images.split(",")
+
+    await Promise.all(arrayImages.map(async (image) => {
+      await deleteImage(image)
+    }))
+   
+  
+    await prisma.visa.delete({
+      where: {
+        id: visaId,
+      },
+    });
+  
+    
+    redirect("/dashboard/visa");
+  }
 
 
 
