@@ -15,6 +15,7 @@ model Banner {
   updatedAt   DateTime @updatedAt
   ctaText     String?
   subtitle    String?
+  For         String?  
 }
 
 model TravelPackage {

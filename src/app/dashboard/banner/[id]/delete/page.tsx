@@ -10,13 +10,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import prisma from "@/lib/db";
 import Link from "next/link";
+import { unstable_noStore } from 'next/cache'
 
-export default function DeleteBannerRoute({
+
+ const getData = async (bannerId: string) => {
+  const banner = await prisma.banner.findUnique({
+    where: {
+      id: bannerId,
+    },
+
+    select: {
+        imageString: true,
+    }
+
+    
+    }
+  )
+  
+  return banner
+}
+
+export default async function DeleteBannerRoute({
   params,
 }: {
   params: { id: string };
-}) {
+})
+
+{
+   unstable_noStore();
+  const data = await getData(params.id);
+  const imageString = data?.imageString
+
   return (
     <div className="h-[80vh] w-full flex items-center justify-center">
       <Card className="max-w-xl">
@@ -33,6 +59,7 @@ export default function DeleteBannerRoute({
           </Button>
           <form action={deleteBanner}>
             <input type="hidden" name="bannerId" value={params.id} />
+            <input type="hidden" name="image" value={imageString} />
             <SubmitButton variant="destructive" text="Delete Product" />
           </form>
         </CardFooter>

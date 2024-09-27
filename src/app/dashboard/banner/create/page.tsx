@@ -82,6 +82,18 @@ export default function BannerRoute() {
             </div>
 
             <div className="flex flex-col gap-3">
+              <Label>Banner for</Label>
+              <Input
+                name={fields.for.name}
+                key={fields.for.key}
+                defaultValue={fields.for.initialValue}
+                type="text"
+                placeholder="what is banner for"
+              />
+              <p className="text-red-500">{fields.for.errors}</p>
+            </div>
+
+            <div className="flex flex-col gap-3">
               <Label>Image</Label>
               <input
                 type="hidden"

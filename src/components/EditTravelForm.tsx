@@ -24,7 +24,7 @@ import { travelPackageSchema } from "@/lib/zodSchema";
 import { UploadDropzone } from "@/lib/uploadthing";
 import {JsonValue } from "@prisma/client/runtime/library";
 
-import { editPackage } from "@/action";
+import { deleteImage, editPackage } from "@/action";
 
 interface EditTravelFormProps {
     data: {
@@ -87,9 +87,14 @@ export function EditForm({ data }: EditTravelFormProps) {
     });
   };
 
-  const handleDelete = (index: number) => {
-    setImages(images.filter((_, i) => i !== index));
-  };
+  const handleDelete = async (imageUrl: string) => {
+    const result= await deleteImage(imageUrl)
+ 
+     if (result.status === "success") {
+       setImages((prev) => prev.filter((url) => url !== imageUrl));
+     }
+   
+   };
 
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
@@ -219,7 +224,7 @@ export function EditForm({ data }: EditTravelFormProps) {
                       className="w-full h-full object-cover rounded-lg border"
                     />
                     <button
-                      onClick={() => handleDelete(index)}
+                      onClick={() => handleDelete(image)}
                       type="button"
                       className="absolute -top-3 -right-3 bg-red-500 p-2 rounded-lg text-white"
                     >

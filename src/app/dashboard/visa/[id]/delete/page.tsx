@@ -3,6 +3,7 @@
 import { deleteVisa } from "@/action";
 import { SubmitButton } from "@/components/SubmitButtons";
 import { Button } from "@/components/ui/button";
+import { unstable_noStore } from 'next/cache'
 import {
   Card,
   CardDescription,
@@ -28,6 +29,7 @@ async function getData(visaId: string) {
 }
 
 export default async function DeleteRoute({ params }: { params: { id: string } }) {
+    unstable_noStore(); 
     const data = await getData(params.id);
   return (
     <div className="h-[80vh] w-full flex items-center justify-center">

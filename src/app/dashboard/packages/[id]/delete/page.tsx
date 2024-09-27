@@ -10,9 +10,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import prisma from "@/lib/db";
+import { unstable_noStore } from "next/cache";
 import Link from "next/link";
 
-export default function DeleteRoute({ params }: { params: { id: string } }) {
+
+async function getData(packageId: string) {
+  const data = await prisma.travelPackage.findUnique({
+    where: {
+      id: packageId,
+    },
+    select: {
+        images: true
+    }
+  });
+
+  return data;
+
+}
+
+export default async function DeleteRoute({ params }: { params: { id: string } }) {
+
+  unstable_noStore(); 
+  const data = await getData(params.id);
   return (
     <div className="h-[80vh] w-full flex items-center justify-center">
       <Card className="max-w-xl">
@@ -29,6 +49,7 @@ export default function DeleteRoute({ params }: { params: { id: string } }) {
           </Button>
           <form action={deleteTravelPackage}>
             <input type="hidden" name="packageId" value={params.id} />
+            <input type="hidden" name="images" value={(data?.images)} />
             <SubmitButton variant="destructive" text="Delete Product" />
           </form>
         </CardFooter>

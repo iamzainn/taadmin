@@ -8,6 +8,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
 import { travelPackageSchema } from "../src/lib/zodSchema";
 
+
 const utapi = new UTApi();
 
 
@@ -35,6 +36,7 @@ export async function createBanner(prevState: unknown, formData: FormData) {
         title: submission.value.title,
         imageString: submission.value.imageString,
         subtitle: submission.value.subtitle,
+        For: submission.value.for
         
       },
     });
@@ -48,16 +50,17 @@ export async function createBanner(prevState: unknown, formData: FormData) {
     if (!user ) throw new Error("Unauthorized");
    
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
-    
-  
+     
+     const bannerImageId = formData.get("bannerImageId") as string;
+
+     await Promise.all([deleteImage(bannerImageId)]);
     await prisma.banner.delete({
       where: {
         id: formData.get("bannerId") as string,
       },
 
     });
-    console.log(formData.get("bannerId"))
-    // await deleteUTFiles([formData.get("bannerId") as string]);
+    
   
     redirect("/dashboard/banner");
   }
@@ -112,6 +115,12 @@ export async function deleteTravelPackage(formData: FormData) {
   if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
 
   const packageId = formData.get("packageId") as string;
+  const images=formData.get("images") as string;
+    const arrayImages = images.split(",")
+
+    await Promise.all(arrayImages.map(async (image) => {
+      await deleteImage(image)
+    }))
 
   await prisma.travelPackage.delete({
     where: {
