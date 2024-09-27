@@ -51,7 +51,7 @@ export async function createBanner(prevState: unknown, formData: FormData) {
    
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
      
-     const bannerImageId = formData.get("bannerImageId") as string;
+     const bannerImageId = formData.get("image") as string;
 
      await Promise.all([deleteImage(bannerImageId)]);
     await prisma.banner.delete({
@@ -248,6 +248,9 @@ export async function editVisa (prevState: unknown, formData: FormData) {
 
 
   const visaId = formData.get("visaId") as string;
+  const flattenUrls = submission.value.images.flatMap((urlString) =>
+    urlString.split(",").map((url) => url.trim())
+  );
  
   const { agentName, agentPhone, agentEmail, ...visaData } = submission.value;
 
@@ -265,6 +268,7 @@ export async function editVisa (prevState: unknown, formData: FormData) {
         where: { id: visaId },
         data: {
           ...visaData,
+          images: flattenUrls,
           
           agentId: agent.id,
         },
