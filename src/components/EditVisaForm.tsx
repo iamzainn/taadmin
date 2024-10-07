@@ -20,70 +20,81 @@ import { parseWithZod } from "@conform-to/zod";
 import { ChevronLeft, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 import { deleteImage, editVisa } from "@/action";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface VisaEditFormProps {
-    data:{
-      id: string;
-      agentName: string;
-      agentEmail: string;
-      agentId: string;
-      agentPhone: string;
-      countryName: string;
-      description: string;
-      pricing: number;
-      requiredDocuments: string;
-      visaValidity: number;
-      images: string[];
-
-      
-    }
+interface Agent {
+  id: string;
+  name: string;
 }
 
+interface VisaEditFormProps {
+  data: {
+    id: string;
+    agentId: string;
+    countryName: string;
+    description: string;
+    pricing: number;
+    requiredDocuments: string;
+    visaValidity: number;
+    images: string[];
+  }
+}
 
-export default function VisaEditForm({data}: VisaEditFormProps) {
-  const [images, setImages] = useState<string[]>(data.images)
-
+export default function VisaEditForm({ data }: VisaEditFormProps) {
+  const [images, setImages] = useState<string[]>(data.images);
+  const [agents, setAgents] = useState<Agent[]>([]);
   const [, action] = useFormState(editVisa, undefined);
 
-
-const [form, fields] = useForm({
+  const [form, fields] = useForm({
     lastResult: null,
     onValidate({ formData }) {
-      console.log(formData + "onvalidate")
       return parseWithZod(formData, { schema: visaSchema });
     },
-
-    
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     defaultValue: {
-        countryName: data.countryName,
-        description: data.description,
-        pricing: data.pricing.toString(),
-        requiredDocuments: data.requiredDocuments,
-        visaValidity: data.visaValidity.toString(),
-        agentPhone: data.agentPhone,
-        agentEmail: data.agentEmail,
-        agentName: data.agentName,
+      countryName: data.countryName,
+      description: data.description,
+      pricing: data.pricing.toString(),
+      requiredDocuments: data.requiredDocuments,
+      visaValidity: data.visaValidity.toString(),
+      agentId: data.agentId,
     },
   });
 
-  const handleDelete = async (imageUrl: string) => {
-   const result= await deleteImage(imageUrl)
+  useEffect(() => {
+    const fetchAgents = async () => {
+      try {
+        const response = await fetch("/api/agents", {
+          method: "GET",
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data);
+          setAgents(data);
+        } else {
+          console.error("Failed to fetch agents:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching agents:", error);
+      }
+    };
+    fetchAgents();
+  }, []);
 
+  const handleDelete = async (imageUrl: string) => {
+    const result = await deleteImage(imageUrl);
     if (result.status === "success") {
       setImages((prev) => prev.filter((url) => url !== imageUrl));
     }
-  
   };
 
   return (
-    <form id={form.id} onSubmit={form.onSubmit} action={action} >
-       <input type="hidden" name="visaId" value={data.id} />
+    <form id={form.id} onSubmit={form.onSubmit} action={action}>
+      <input type="hidden" name="visaId" value={data.id} />
       <div className="flex items-center gap-x-4">
         <Button variant="outline" size="icon" asChild>
           <Link href="/dashboard/visa">
@@ -123,9 +134,7 @@ const [form, fields] = useForm({
                 rows={4}
               />
               {fields.requiredDocuments.errors && (
-                <p className="text-red-500">
-                  {fields.requiredDocuments.errors}
-                </p>
+                <p className="text-red-500">{fields.requiredDocuments.errors}</p>
               )}
             </div>
 
@@ -134,9 +143,8 @@ const [form, fields] = useForm({
               <Textarea
                 id="description"
                 name={fields.description.name}
-                key={fields.description.key}
                 defaultValue={fields.description.initialValue}
-                placeholder="Enter visa description (optional)"
+                placeholder="Enter visa description"
                 rows={4}
               />
               {fields.description.errors && (
@@ -145,14 +153,13 @@ const [form, fields] = useForm({
             </div>
 
             <div className="flex flex-col gap-3">
-              <Label htmlFor="pricing">Pricing (in cents)</Label>
+              <Label htmlFor="pricing">Pricing</Label>
               <Input
                 id="pricing"
                 name={fields.pricing.name}
-                key={fields.pricing.key}
                 defaultValue={fields.pricing.initialValue}
                 type="number"
-                placeholder="Enter pricing in cents"
+                placeholder="Enter pricing in rupees"
               />
               {fields.pricing.errors && (
                 <p className="text-red-500">{fields.pricing.errors}</p>
@@ -174,42 +181,21 @@ const [form, fields] = useForm({
             </div>
 
             <div className="flex flex-col gap-3">
-              <Label htmlFor="agentName">Agent Name</Label>
-              <Input
-                id="agentName"
-                name={fields.agentName.name}
-                defaultValue={fields.agentName.initialValue}
-                placeholder="Enter agent name"
-              />
-              {fields.agentName.errors && (
-                <p className="text-red-500">{fields.agentName.errors}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="agentPhone">Agent Phone</Label>
-              <Input
-                id="agentPhone"
-                name={fields.agentPhone.name}
-                defaultValue={fields.agentPhone.initialValue}
-                placeholder="Enter agent phone number"
-              />
-              {fields.agentPhone.errors && (
-                <p className="text-red-500">{fields.agentPhone.errors}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="agentEmail">Agent Email</Label>
-              <Input
-                id="agentEmail"
-                name={fields.agentEmail.name}
-                defaultValue={fields.agentEmail.initialValue}
-                placeholder="Enter agent email"
-                type="email"
-              />
-              {fields.agentEmail.errors && (
-                <p className="text-red-500">{fields.agentEmail.errors}</p>
+              <Label htmlFor="agentId">Agent</Label>
+              <Select name={fields.agentId.name} defaultValue={data.agentId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an agent" />
+                </SelectTrigger>
+                <SelectContent>
+                  {agents.map((agent) => (
+                    <SelectItem key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fields.agentId.errors && (
+                <p className="text-red-500">{fields.agentId.errors}</p>
               )}
             </div>
 
@@ -217,10 +203,8 @@ const [form, fields] = useForm({
               <Label>Images</Label>
               <input
                 type="hidden"
-                value={images}
-                key={fields.images.key}
+                value={images.join(',')}
                 name={fields.images.name}
-                defaultValue={fields.images.initialValue as undefined}
               />
               {images.length > 0 ? (
                 <div className="flex gap-5">
@@ -230,7 +214,7 @@ const [form, fields] = useForm({
                         height={100}
                         width={100}
                         src={image}
-                        alt="Product Image"
+                        alt="Visa Image"
                         className="w-full h-full object-cover rounded-lg border"
                       />
                       <button
@@ -255,7 +239,9 @@ const [form, fields] = useForm({
                   }}
                 />
               )}
-              <p className="text-red-500">{fields.images.errors}</p>
+              {fields.images.errors && (
+                <p className="text-red-500">{fields.images.errors}</p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -266,5 +252,3 @@ const [form, fields] = useForm({
     </form>
   );
 }
-
-

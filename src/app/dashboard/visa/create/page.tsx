@@ -1,6 +1,7 @@
 "use client";
 
-import { visaSchema } from "@/lib/zodSchema";
+
+import { createVisa } from "@/action";
 import { SubmitButton } from "@/components/SubmitButtons";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,19 +14,27 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+
 import { UploadDropzone } from "@/lib/uploadthing";
+import { visaSchema } from "@/lib/zodSchema";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { ChevronLeft, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { createVisa } from "@/action";
+import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
+
+interface Agent {
+  id: string;
+  name: string;
+}
 
 export default function VisaCreateRoute() {
   const [images, setImages] = useState<string[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
   const [, action] = useFormState(createVisa, undefined);
 
   const [form, fields] = useForm({
@@ -35,6 +44,19 @@ export default function VisaCreateRoute() {
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
   });
+
+  useEffect(() => {
+    const fetchAgents = async () => {
+      const response = await fetch("/app/api/agents");
+      if (response.ok) {
+        
+        const data = await response.json();
+        console.log(data);
+        setAgents(data);
+      }
+    };
+    fetchAgents();
+  }, []);
 
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
@@ -58,6 +80,7 @@ export default function VisaCreateRoute() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-y-6">
+            {/* Country Name */}
             <div className="flex flex-col gap-3">
               <Label htmlFor="countryName">Country Name</Label>
               <Input
@@ -71,6 +94,7 @@ export default function VisaCreateRoute() {
               )}
             </div>
 
+            {/* Required Documents */}
             <div className="flex flex-col gap-3">
               <Label htmlFor="requiredDocuments">Required Documents</Label>
               <Textarea
@@ -81,20 +105,18 @@ export default function VisaCreateRoute() {
                 rows={4}
               />
               {fields.requiredDocuments.errors && (
-                <p className="text-red-500">
-                  {fields.requiredDocuments.errors}
-                </p>
+                <p className="text-red-500">{fields.requiredDocuments.errors}</p>
               )}
             </div>
 
+            {/* Description */}
             <div className="flex flex-col gap-3">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 name={fields.description.name}
-                key={fields.description.key}
                 defaultValue={fields.description.initialValue}
-                placeholder="Enter visa description (optional)"
+                placeholder="Enter visa description"
                 rows={4}
               />
               {fields.description.errors && (
@@ -102,21 +124,22 @@ export default function VisaCreateRoute() {
               )}
             </div>
 
+            {/* Pricing */}
             <div className="flex flex-col gap-3">
-              <Label htmlFor="pricing">Pricing (in cents)</Label>
+              <Label htmlFor="pricing">Pricing</Label>
               <Input
                 id="pricing"
                 name={fields.pricing.name}
-                key={fields.pricing.key}
                 defaultValue={fields.pricing.initialValue}
                 type="number"
-                placeholder="Enter pricing in cents"
+                placeholder="Enter pricing in rupees"
               />
               {fields.pricing.errors && (
                 <p className="text-red-500">{fields.pricing.errors}</p>
               )}
             </div>
 
+            {/* Visa Validity */}
             <div className="flex flex-col gap-3">
               <Label htmlFor="visaValidity">Visa Validity (in days)</Label>
               <Input
@@ -131,54 +154,34 @@ export default function VisaCreateRoute() {
               )}
             </div>
 
+            {/* Agent Selection */}
             <div className="flex flex-col gap-3">
-              <Label htmlFor="agentName">Agent Name</Label>
-              <Input
-                id="agentName"
-                name={fields.agentName.name}
-                defaultValue={fields.agentName.initialValue}
-                placeholder="Enter agent name"
-              />
-              {fields.agentName.errors && (
-                <p className="text-red-500">{fields.agentName.errors}</p>
+              <Label htmlFor="agentId">Agent</Label>
+              <Select name={fields.agentId.name}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an agent" />
+                </SelectTrigger>
+                <SelectContent>
+                  {agents.map((agent) => (
+                    <SelectItem key={agent.id} value={agent.id}>
+                      {agent.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fields.agentId.errors && (
+                <p className="text-red-500">{fields.agentId.errors}</p>
               )}
             </div>
 
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="agentPhone">Agent Phone</Label>
-              <Input
-                id="agentPhone"
-                name={fields.agentPhone.name}
-                defaultValue={fields.agentPhone.initialValue}
-                placeholder="Enter agent phone number"
-              />
-              {fields.agentPhone.errors && (
-                <p className="text-red-500">{fields.agentPhone.errors}</p>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="agentEmail">Agent Email</Label>
-              <Input
-                id="agentEmail"
-                name={fields.agentEmail.name}
-                defaultValue={fields.agentEmail.initialValue}
-                placeholder="Enter agent email"
-                type="email"
-              />
-              {fields.agentEmail.errors && (
-                <p className="text-red-500">{fields.agentEmail.errors}</p>
-              )}
-            </div>
-
+            {/* Images */}
             <div className="flex flex-col gap-3">
               <Label>Images</Label>
               <input
                 type="hidden"
                 value={images}
-                key={fields.images.key}
                 name={fields.images.name}
-                defaultValue={fields.images.initialValue as undefined}
+                defaultValue={fields.images.initialValue as string[]}
               />
               {images.length > 0 ? (
                 <div className="flex gap-5">

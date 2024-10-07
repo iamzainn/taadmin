@@ -24,6 +24,10 @@ const links = [
   { 
     name:"Visa",
     href:"/dashboard/visa"
+   },
+   {
+    name:"Agent",
+    href:"/dashboard/agent"
    }
 ];
 

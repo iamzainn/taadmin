@@ -1,3 +1,5 @@
+// app/dashboard/agent/page.tsx
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,56 +25,60 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-
 import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/lib/db";
 
-async function getVisas() {
-  const visas = await prisma.visa.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
+
+async function getAgents() {
+  const agents = await prisma.agent.findMany({
+  select: {
+    id: true,
+    name: true,
+    email: true,
+    phone: true,
+  }
   });
 
-  return visas;
+  return agents;
 }
 
-
-
-export default async function PackagesRoute() {
+export default async function AgentListPage() {
   noStore();
-  const visas = await getVisas();
-  
+  const agents = await getAgents();
 
   return (
     <>
       <div className="flex items-center justify-end">
         <Button asChild className="flex gap-x-2">
-          <Link href="/dashboard/visa/create">
+          <Link href="/dashboard/agent/create">
             <PlusCircle className="h-3.5 w-3.5" />
-            <span>Add Visa</span>
+            <span>Add Agent</span>
           </Link>
         </Button>
       </div>
 
       <Card className="mt-5">
         <CardHeader>
-          <CardTitle>Visas</CardTitle>
-          <CardDescription>Manage your visas</CardDescription>
+          <CardTitle>Agents</CardTitle>
+          <CardDescription>Manage your agents</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Country name</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
                 <TableHead className="text-end">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {visas.map((visa) => (
-                <TableRow key={visa.id}>
-                  <TableCell className="font-medium">{visa.countryName}</TableCell>
+              {agents.map((agent) => (
+                <TableRow key={agent.id}>
+                  <TableCell className="font-medium">{agent.name}</TableCell>
+                  <TableCell>{agent.email}</TableCell>
+                  <TableCell>{agent.phone}</TableCell>
                   <TableCell className="text-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -84,12 +90,12 @@ export default async function PackagesRoute() {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/visa/${visa.id}`}>
+                          <Link href={`/dashboard/agent/${agent.id}`}>
                             Edit
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/visa/${visa.id}/delete`}>
+                          <Link href={`/dashboard/agent/${agent.id}/delete`}>
                             Delete
                           </Link>
                         </DropdownMenuItem>

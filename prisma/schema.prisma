@@ -84,9 +84,24 @@ model Visa {
 }
 
 model Agent {
-  id    String @id
+  id    String @id @default(cuid())
   name  String
   phone String
   email String @unique
   Visa  Visa[]
+}
+
+model CustomUmrahPackages{
+   id                String   @id @default(cuid())
+   location String
+   hotelName String
+   checkIn DateTime
+   checkOut DateTime
+   rooms Int
+   nights Int
+   Sector String
+   VehicleType String
+   CustomerName String
+   phoneNumber String
+   email String
 }

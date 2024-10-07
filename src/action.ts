@@ -2,11 +2,12 @@
 
 import { redirect } from "next/navigation";
 import { parseWithZod } from "@conform-to/zod";
-import {  bannerSchema, visaSchema} from "../src/lib/zodSchema";
+import {  ActionResult, agentSchema, bannerSchema, visaSchema} from "../src/lib/zodSchema";
 import prisma from "./lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
 import { travelPackageSchema } from "../src/lib/zodSchema";
+
 
 
 const utapi = new UTApi();
@@ -177,13 +178,11 @@ export async function editPackage(prevState: unknown, formData: FormData) {
 
 export async function createVisa(prevState: unknown, formData: FormData) {
   const user = await currentUser();
-  if (!user) throw new Error("Unauthorized");
-  
-  if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
+  if (!user || user.publicMetadata.role !== "admin") {
+    throw new Error("Unauthorized");
+  }
 
-  const submission = parseWithZod(formData, {
-    schema: visaSchema,
-  });
+  const submission = parseWithZod(formData, { schema: visaSchema });
 
   if (submission.status !== "success") {
     return submission.reply();
@@ -194,34 +193,11 @@ export async function createVisa(prevState: unknown, formData: FormData) {
   );
 
   try {
-    await prisma.$transaction(async (tx) => {
-      // Create or update the agent
-      const agent = await tx.agent.upsert({
-        where: { email: submission.value.agentEmail },
-        update: {
-          name: submission.value.agentName,
-          phone: submission.value.agentPhone,
-        },
-        create: {
-          id: `agent_${Date.now()}`, // Generate a unique ID
-          name: submission.value.agentName,
-          phone: submission.value.agentPhone,
-          email: submission.value.agentEmail,
-        },
-      });
-
-      // Create the visa and associate it with the agent
-      await tx.visa.create({
-        data: {
-          countryName: submission.value.countryName,
-          requiredDocuments: submission.value.requiredDocuments,
-          description: submission.value.description,
-          images: flattenUrls,
-          pricing: submission.value.pricing,
-          visaValidity: submission.value.visaValidity,
-          agentId: agent.id,
-        },
-      });
+    await prisma.visa.create({
+      data: {
+        ...submission.value,
+        images: flattenUrls,
+      },
     });
   } catch (error) {
     console.error("Failed to create visa:", error);
@@ -231,59 +207,38 @@ export async function createVisa(prevState: unknown, formData: FormData) {
   redirect("/dashboard/visa");
 }
 
-export async function editVisa (prevState: unknown, formData: FormData) {
+export async function editVisa(prevState: unknown, formData: FormData) {
   const user = await currentUser();
-  if (!user) throw new Error("Unauthorized");
-  
-  if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
+  if (!user || user.publicMetadata.role !== "admin") {
+    throw new Error("Unauthorized");
+  }
 
-  const submission = parseWithZod(formData, {
-    schema: visaSchema,
-  }); 
+  const submission = parseWithZod(formData, { schema: visaSchema });
 
   if (submission.status !== "success") {
     return submission.reply();
   }
 
-
-
   const visaId = formData.get("visaId") as string;
   const flattenUrls = submission.value.images.flatMap((urlString) =>
     urlString.split(",").map((url) => url.trim())
   );
- 
-  const { agentName, agentPhone, agentEmail, ...visaData } = submission.value;
 
   try {
-    await prisma.$transaction(async (tx) => {
-     
-      const agent = await tx.agent.update({
-        where: { email: agentEmail },
-        data: {
-          name: agentName,
-          phone: agentPhone,
-        }
-      });
-      await tx.visa.update({
-        where: { id: visaId },
-        data: {
-          ...visaData,
-          images: flattenUrls,
-          
-          agentId: agent.id,
-        },
-      });
+    await prisma.visa.update({
+      where: { id: visaId },
+      data: {
+        ...submission.value,
+        images: flattenUrls,
+      },
     });
-
-   
   } catch (error) {
     console.error("Failed to update visa:", error);
     return { status: "error", message: "Failed to update visa" };
   }
-  redirect("/dashboard/visa");
-  
 
-  } 
+  redirect("/dashboard/visa");
+}
 
 
   export async function deleteImage(imageUrl:string) {
@@ -330,11 +285,85 @@ export async function editVisa (prevState: unknown, formData: FormData) {
 
 
 
-
-
-
-
-
+  export async function createAgent(prevState: unknown, formData: FormData): Promise<ActionResult> {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      return { status: 'error', message: "Unauthorized" };
+    }
   
+    const submission = parseWithZod(formData, { schema: agentSchema });
+  
+    if (submission.status !== "success") {
+      return { status: 'error', message: "Validation failed" };
+    }
+  
+    try {
+      await prisma.agent.create({
+        data: submission.value,
+      });
+          
+      
+
+      
+    } catch (error) {
+      console.error("Failed to create agent:", error);
+      return { status: 'error', message: "Failed to create agent" };
+    }
+
+    redirect("/dashboard/agent");
+
+  }
+  
+  export async function updateAgent(prevState: unknown, formData: FormData): Promise<ActionResult> {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      return { status: 'error', message: "Unauthorized" };
+    }
+  
+    const submission = parseWithZod(formData, { schema: agentSchema });
+  
+    if (submission.status !== "success") {
+      return { status: 'error', message: "Validation failed" };
+    }
+  
+    const agentId = formData.get("agentId") as string;
+  
+    try {
+      await prisma.agent.update({
+        where: { id: agentId },
+        data: submission.value,
+      });
 
 
+     
+      
+    } catch (error) {
+      console.error("Failed to update agent:", error);
+      return { status: 'error', message: "Failed to update agent" };
+    }
+
+    redirect("/dashboard/agent");
+    
+  }
+  
+  export async function deleteAgent( formData: FormData): Promise<ActionResult> {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      return { status: 'error', message: "Unauthorized" };
+    }
+  
+    const agentId = formData.get("agentId") as string;
+  
+    try {
+      await prisma.agent.delete({
+        where: { id: agentId },
+      });
+
+      
+      
+    } catch (error) {
+      console.error("Failed to delete agent:", error);
+      return { status: 'error', message: "Failed to delete agent" };
+    }
+    redirect("/dashboard/agent");
+  }

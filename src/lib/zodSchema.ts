@@ -32,8 +32,20 @@ export const visaSchema = z.object({
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
   pricing: z.coerce.number().int().positive("Pricing must be a positive integer"),
   visaValidity: z.coerce.number().int().positive("Visa validity must be a positive integer"),
-  agentName: z.string().min(1, "Agent name is required"),
-  agentPhone: z.string().min(1, "Agent phone is required"),
-  agentEmail: z.string().email("Invalid email address"),
+  agentId: z.string().min(1, "Agent is required"),
 });
 export type VisaSchemaType = z.infer<typeof visaSchema>;
+
+
+export const agentSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(1, "Phone number is required"),
+});
+
+export type AgentSchemaType = z.infer<typeof agentSchema>;
+
+export interface ActionResult {
+  status: 'success' | 'error';
+  message: string;
+}

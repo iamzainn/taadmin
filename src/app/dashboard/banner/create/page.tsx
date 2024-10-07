@@ -1,4 +1,3 @@
-
 "use client";
 
 import { createBanner } from "@/action";
@@ -15,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
@@ -83,13 +83,19 @@ export default function BannerRoute() {
 
             <div className="flex flex-col gap-3">
               <Label>Banner for</Label>
-              <Input
+              <Select 
                 name={fields.for.name}
                 key={fields.for.key}
                 defaultValue={fields.for.initialValue}
-                type="text"
-                placeholder="what is banner for"
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select banner purpose" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Home">Home</SelectItem>
+                  <SelectItem value="Visa">Visa</SelectItem>
+                </SelectContent>
+              </Select>
               <p className="text-red-500">{fields.for.errors}</p>
             </div>
 
@@ -112,7 +118,7 @@ export default function BannerRoute() {
                 />
               ) : (
                 <UploadDropzone
-                className="object-cover border rounded-lg bg-gray-600 flex items-center justify-center"
+                  className="object-cover border rounded-lg bg-gray-600 flex items-center justify-center"
                   onClientUploadComplete={(res) => {
                     setImages(res[0].url);
                   }}
