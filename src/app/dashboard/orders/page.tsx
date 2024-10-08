@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: 'Manage custom travel orders and package subscriptions',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function OrdersPage() {
   return (
     <div className="container mx-auto p-6">
