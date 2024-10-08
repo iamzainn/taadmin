@@ -47,7 +47,7 @@ export default function VisaCreateRoute() {
 
   useEffect(() => {
     const fetchAgents = async () => {
-      const response = await fetch("/app/api/agents");
+      const response = await fetch("/api/agents");
       if (response.ok) {
         
         const data = await response.json();
@@ -94,7 +94,7 @@ export default function VisaCreateRoute() {
               )}
             </div>
 
-            {/* Required Documents */}
+            
             <div className="flex flex-col gap-3">
               <Label htmlFor="requiredDocuments">Required Documents</Label>
               <Textarea
@@ -132,6 +132,7 @@ export default function VisaCreateRoute() {
                 name={fields.pricing.name}
                 defaultValue={fields.pricing.initialValue}
                 type="number"
+                min={0}
                 placeholder="Enter pricing in rupees"
               />
               {fields.pricing.errors && (
