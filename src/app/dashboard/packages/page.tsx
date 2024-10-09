@@ -28,6 +28,9 @@ import Link from "next/link";
 import { unstable_noStore as noStore } from "next/cache";
 import prisma from "@/lib/db";
 
+export const dynamic = 'force-dynamic';
+
+
 async function getPackages() {
   const packages = await prisma.travelPackage.findMany({
     orderBy: {
