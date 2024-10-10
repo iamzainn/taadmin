@@ -414,6 +414,7 @@ export async function editVisa(prevState: unknown, formData: FormData) {
 
 
   export async function editUmrahPackage(prevState: unknown, formData: FormData) {
+    console.log("editUmrahPackage")
     const user = await currentUser()
     if (!user ) throw new Error("Unauthorized");
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");

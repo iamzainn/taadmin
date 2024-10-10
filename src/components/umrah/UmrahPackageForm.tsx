@@ -327,11 +327,7 @@ export function EditUmrahForm({ data: initialData }: UmrahPackageFormProps) {
         </CardContent>
         <CardFooter>
           <input type="hidden" name="packageId" value={initialData?.id} />
-          
-         
-          <SubmitButton text={ "Update Package" }>
-            
-          </SubmitButton>
+          <SubmitButton text={ "Update Package" }/>
         </CardFooter>
       </Card>
     </form>
