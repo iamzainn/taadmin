@@ -105,3 +105,22 @@ model CustomUmrahPackages{
    phoneNumber String
    email String
 }
+
+
+model UmrahPackage {
+  id                String   @id @default(cuid())
+  title             String
+  description       String
+  hotelMakkah       String
+  hotelMakkahRating Int
+  hotelMadinah      String
+  hotelMadinahRating Int
+  nightsInMakkah    Int
+  nightsInMadinah   Int
+  transportation    Boolean
+  price             BigInt
+  image             String?
+  inclusions        String[] // New field for package inclusions
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

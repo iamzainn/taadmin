@@ -2,11 +2,13 @@
 
 import { redirect } from "next/navigation";
 import { parseWithZod } from "@conform-to/zod";
-import {  ActionResult, agentSchema, bannerSchema, visaSchema} from "../src/lib/zodSchema";
+import {  ActionResult, agentSchema, bannerSchema, umrahPackageSchema, visaSchema} from "../src/lib/zodSchema";
 import prisma from "./lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
 import { travelPackageSchema } from "../src/lib/zodSchema";
+import { revalidatePath } from "next/cache";
+// import { revalidatePath } from "next/cache";
 
 
 
@@ -366,4 +368,89 @@ export async function editVisa(prevState: unknown, formData: FormData) {
       return { status: 'error', message: "Failed to delete agent" };
     }
     redirect("/dashboard/agent");
+  }
+
+
+  export async function createUmrahPackage(prevState: unknown, formData: FormData) {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
+  
+    const submission = umrahPackageSchema.safeParse({
+      title: formData.get("title"),
+      description: formData.get("description"),
+      hotelMakkah: formData.get("hotelMakkah"),
+      hotelMakkahRating: Number(formData.get("hotelMakkahRating")),
+      hotelMadinah: formData.get("hotelMadinah"),
+      hotelMadinahRating: Number(formData.get("hotelMadinahRating")),
+      nightsInMakkah: Number(formData.get("nightsInMakkah")),
+      nightsInMadinah: Number(formData.get("nightsInMadinah")),
+      transportation: formData.get("transportation") === "on",
+      price: Number(formData.get("price")),
+      image: formData.get("image"),
+      inclusions: JSON.parse(formData.get("inclusions") as string),
+    });
+  
+    if (!submission.success) {
+      return {
+        errors: submission.error.flatten().fieldErrors,
+      };
+    }
+  
+    try {
+      await prisma.umrahPackage.create({
+        data: submission.data,
+      });
+    } catch (error) {
+      return { error: "Failed to create Umrah package" };
+    }
+    revalidatePath("/dashboard/umrah-packages");
+    redirect("/dashboard/umrah-packages");
+  }
+
+
+  export async function editUmrahPackage(prevState: unknown, formData: FormData) {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
+  
+    const id = formData.get("id") as string;
+    if (!id) {
+      return { error: "Package ID is required" };
+    }
+  
+    const submission = umrahPackageSchema.safeParse({
+      title: formData.get("title"),
+      description: formData.get("description"),
+      hotelMakkah: formData.get("hotelMakkah"),
+      hotelMakkahRating: Number(formData.get("hotelMakkahRating")),
+      hotelMadinah: formData.get("hotelMadinah"),
+      hotelMadinahRating: Number(formData.get("hotelMadinahRating")),
+      nightsInMakkah: Number(formData.get("nightsInMakkah")),
+      nightsInMadinah: Number(formData.get("nightsInMadinah")),
+      transportation: formData.get("transportation") === "on",
+      price: Number(formData.get("price")),
+      image: formData.get("image"),
+      inclusions: JSON.parse(formData.get("inclusions") as string),
+    });
+  
+    if (!submission.success) {
+      return {
+        errors: submission.error.flatten().fieldErrors,
+      };
+    }
+  
+    try {
+      await prisma.umrahPackage.update({
+        where: { id },
+        data: submission.data,
+      });
+    } catch (error) {
+      return { error: "Failed to update Umrah package" };
+    }
+  
+    revalidatePath("/dashboard/umrah-packages");
+    redirect("/dashboard/umrah-packages");
   }

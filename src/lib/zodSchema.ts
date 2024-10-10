@@ -49,3 +49,20 @@ export interface ActionResult {
   status: 'success' | 'error';
   message: string;
 }
+
+
+
+export const umrahPackageSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(10, "Description must be at least 10 characters long"),
+  hotelMakkah: z.string().min(1, "Hotel in Makkah is required"),
+  hotelMakkahRating: z.number().int().min(1).max(5),
+  hotelMadinah: z.string().min(1, "Hotel in Madinah is required"),
+  hotelMadinahRating: z.number().int().min(1).max(5),
+  nightsInMakkah: z.number().int().min(1, "At least one night in Makkah is required"),
+  nightsInMadinah: z.number().int().min(1, "At least one night in Madinah is required"),
+  transportation: z.boolean(),
+  price: z.number().min(1, "Price must be at least 1"),
+  image: z.string().optional(),
+  inclusions: z.array(z.string()).min(1, "At least one inclusion is required"),
+});

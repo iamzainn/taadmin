@@ -28,6 +28,10 @@ const links = [
    {
     name:"Agent",
     href:"/dashboard/agent"
+   },
+   {
+    name:"umrah",
+    href:"/dashboard/umrah-packages"
    }
 ];
 
