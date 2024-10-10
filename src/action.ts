@@ -376,81 +376,74 @@ export async function editVisa(prevState: unknown, formData: FormData) {
     if (!user || user.publicMetadata.role !== "admin") {
       throw new Error("Unauthorized");
     }
-  
-    const submission = umrahPackageSchema.safeParse({
-      title: formData.get("title"),
-      description: formData.get("description"),
-      hotelMakkah: formData.get("hotelMakkah"),
-      hotelMakkahRating: Number(formData.get("hotelMakkahRating")),
-      hotelMadinah: formData.get("hotelMadinah"),
-      hotelMadinahRating: Number(formData.get("hotelMadinahRating")),
-      nightsInMakkah: Number(formData.get("nightsInMakkah")),
-      nightsInMadinah: Number(formData.get("nightsInMadinah")),
-      transportation: formData.get("transportation") === "on",
-      price: Number(formData.get("price")),
-      image: formData.get("image"),
-      inclusions: JSON.parse(formData.get("inclusions") as string),
+
+    const submission = parseWithZod(formData, {
+      schema: umrahPackageSchema,
     });
-  
-    if (!submission.success) {
-      return {
-        errors: submission.error.flatten().fieldErrors,
-      };
+    
+    if (submission.status !== "success") {
+      return submission.reply();
     }
+
+      
+      
+        await prisma.umrahPackage.create({
+          data: {
+            title: submission.value.title,
+            description: submission.value.description,
+            hotelMakkah: submission.value.hotelMakkah,
+            hotelMakkahRating: Number(submission.value.hotelMakkahRating),
+            hotelMadinah: submission.value.hotelMadinah,
+            hotelMadinahRating: Number(submission.value.hotelMadinahRating),
+            nightsInMakkah: Number(submission.value.nightsInMakkah),
+            nightsInMadinah: Number(submission.value.nightsInMadinah),
+            transportation: submission.value.transportation,
+            price: submission.value.price,
+            image: submission.value.image,
+
+          },
+        });
+        
+        
+        revalidatePath("/dashboard/umrah-packages");
+        redirect("/dashboard/umrah-packages");
   
-    try {
-      await prisma.umrahPackage.create({
-        data: submission.data,
-      });
-    } catch (error) {
-      return { error: "Failed to create Umrah package" };
-    }
-    revalidatePath("/dashboard/umrah-packages");
-    redirect("/dashboard/umrah-packages");
+    
+    
   }
 
 
   export async function editUmrahPackage(prevState: unknown, formData: FormData) {
-    const user = await currentUser();
-    if (!user || user.publicMetadata.role !== "admin") {
-      throw new Error("Unauthorized");
-    }
+    const user = await currentUser()
+    if (!user ) throw new Error("Unauthorized");
+    if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
   
-    const id = formData.get("id") as string;
-    if (!id) {
-      return { error: "Package ID is required" };
-    }
-  
-    const submission = umrahPackageSchema.safeParse({
-      title: formData.get("title"),
-      description: formData.get("description"),
-      hotelMakkah: formData.get("hotelMakkah"),
-      hotelMakkahRating: Number(formData.get("hotelMakkahRating")),
-      hotelMadinah: formData.get("hotelMadinah"),
-      hotelMadinahRating: Number(formData.get("hotelMadinahRating")),
-      nightsInMakkah: Number(formData.get("nightsInMakkah")),
-      nightsInMadinah: Number(formData.get("nightsInMadinah")),
-      transportation: formData.get("transportation") === "on",
-      price: Number(formData.get("price")),
-      image: formData.get("image"),
-      inclusions: JSON.parse(formData.get("inclusions") as string),
+    const submission = parseWithZod(formData, {
+      schema: umrahPackageSchema,
     });
   
-    if (!submission.success) {
-      return {
-        errors: submission.error.flatten().fieldErrors,
-      };
+    if (submission.status !== "success") {
+      return submission.reply();
     }
+  
+    const packageId = formData.get("packageId") as string;
+    
+  
+    const { ...updateData } = submission.value;
+  
+   
+
   
     try {
       await prisma.umrahPackage.update({
-        where: { id },
-        data: submission.data,
+        where: { id: packageId },
+        data: {
+          ...updateData,
+        },
       });
     } catch (error) {
-      return { error: "Failed to update Umrah package" };
+      return { error: { "": ["Failed to update travel package"] } };
     }
   
-    revalidatePath("/dashboard/umrah-packages");
     redirect("/dashboard/umrah-packages");
   }

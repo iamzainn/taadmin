@@ -24,32 +24,57 @@ import { useFormState } from "react-dom";
 import { SubmitButton } from "@/components/SubmitButtons";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import { UmrahPackage } from "@prisma/client";
-import { createUmrahPackage, editUmrahPackage } from "@/action";
+
+import { deleteImage,  editUmrahPackage } from "@/action";
 
 interface UmrahPackageFormProps {
-  initialData?: UmrahPackage;
+  data:{
+  id: string;
+  title: string;
+  description: string;
+  hotelMakkah: string;
+  hotelMakkahRating: number;
+  hotelMadinah: string;
+  hotelMadinahRating: number;
+  nightsInMakkah: number;
+  nightsInMadinah: number;
+  transportation: boolean;
+  price: bigint;
+  image: string | null;
+  inclusions: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  }
 }
 
-export function UmrahPackageForm({ initialData }: UmrahPackageFormProps) {
-  const isEditing = !!initialData;
-  const [lastResult, action] = useFormState(
-    isEditing ? editUmrahPackage : createUmrahPackage,
-    undefined
-  );
-  const [image, setImage] = useState<string | null>(initialData?.image || null);
-  const [inclusions, setInclusions] = useState<string[]>(
-    initialData?.inclusions || [""]
-  );
+export function EditUmrahForm({ data: initialData }: UmrahPackageFormProps) {
+  const [inclusions, setInclusions] = useState(initialData.inclusions || []);
+  const [image, setImage] = useState(initialData.image);
+  const [lastResult, action] = useFormState(editUmrahPackage, null);
+
+
+
+
+
+  const handleDelete = async (imageUrl: string) => {
+    const result= await deleteImage(imageUrl)
+ 
+     if (result.status === "success") {
+       setImage("");
+     }
+   
+   };
+
 
   const [form, fields] = useForm({
+    
     lastResult,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: umrahPackageSchema });
     },
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
-    defaultValue: initialData,
+    defaultValue: initialData || undefined,
   });
 
   const handleInclusionChange = (index: number, value: string) => {
@@ -77,19 +102,19 @@ export function UmrahPackageForm({ initialData }: UmrahPackageFormProps) {
           </Link>
         </Button>
         <h1 className="text-xl font-semibold tracking-tight">
-          {isEditing ? "Edit" : "New"} Umrah Package
+          Edit Umrah Package
         </h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{isEditing ? "Edit" : "Create"} Umrah Package</CardTitle>
+          <CardTitle> Edit Umrah Package</CardTitle>
           <CardDescription>
-            {isEditing ? "Update your" : "Create a new"} Umrah package here
+            Update your Umrah package
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Title */}
+         
           <div className="flex flex-col gap-3">
             <Label htmlFor={fields.title.id}>Package Title</Label>
             <Input
@@ -103,7 +128,7 @@ export function UmrahPackageForm({ initialData }: UmrahPackageFormProps) {
             )}
           </div>
 
-          {/* Description */}
+          
           <div className="flex flex-col gap-3">
             <Label htmlFor={fields.description.id}>Description</Label>
             <Textarea
@@ -117,7 +142,6 @@ export function UmrahPackageForm({ initialData }: UmrahPackageFormProps) {
             )}
           </div>
 
-          {/* Hotels */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-3">
               <Label htmlFor={fields.hotelMakkah.id}>Hotel in Makkah</Label>
@@ -177,7 +201,7 @@ export function UmrahPackageForm({ initialData }: UmrahPackageFormProps) {
             </div>
           </div>
 
-          {/* Nights */}
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-3">
               <Label htmlFor={fields.nightsInMakkah.id}>Nights in Makkah</Label>
@@ -282,7 +306,7 @@ export function UmrahPackageForm({ initialData }: UmrahPackageFormProps) {
                   variant="destructive"
                   size="icon"
                   className="absolute top-2 right-2"
-                  onClick={() => setImage(null)}
+                  onClick={() =>handleDelete(image)}
                 >
                   <XIcon className="h-4 w-4" />
                 </Button>
@@ -302,14 +326,10 @@ export function UmrahPackageForm({ initialData }: UmrahPackageFormProps) {
           </div>
         </CardContent>
         <CardFooter>
-          <input type="hidden" name="id" value={initialData?.id} />
-          <input type="hidden" name="image" value={image || ""} />
-          <input
-            type="hidden"
-            name="inclusions"
-            value={JSON.stringify(inclusions)}
-          />
-          <SubmitButton text={isEditing ? "Update Package" : "Create Package"}>
+          <input type="hidden" name="packageId" value={initialData?.id} />
+          
+         
+          <SubmitButton text={ "Update Package" }>
             
           </SubmitButton>
         </CardFooter>

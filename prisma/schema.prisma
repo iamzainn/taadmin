@@ -120,7 +120,7 @@ model UmrahPackage {
   transportation    Boolean
   price             BigInt
   image             String?
-  inclusions        String[] // New field for package inclusions
+  inclusions        String[] 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }

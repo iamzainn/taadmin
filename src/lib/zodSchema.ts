@@ -66,3 +66,5 @@ export const umrahPackageSchema = z.object({
   image: z.string().optional(),
   inclusions: z.array(z.string()).min(1, "At least one inclusion is required"),
 });
+
+export type UmrahPackageSchemaType = z.infer<typeof umrahPackageSchema>;
