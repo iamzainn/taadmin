@@ -117,7 +117,7 @@ model UmrahPackage {
   hotelMadinahRating Int
   nightsInMakkah    Int
   nightsInMadinah   Int
-  transportation    Boolean
+  
   price             BigInt
   image             String?
   inclusions        String[] 

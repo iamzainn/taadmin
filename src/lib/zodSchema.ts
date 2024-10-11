@@ -61,7 +61,7 @@ export const umrahPackageSchema = z.object({
   hotelMadinahRating: z.number().int().min(1).max(5),
   nightsInMakkah: z.number().int().min(1, "At least one night in Makkah is required"),
   nightsInMadinah: z.number().int().min(1, "At least one night in Madinah is required"),
-  transportation: z.boolean(),
+  
   price: z.number().min(1, "Price must be at least 1"),
   image: z.string().optional(),
   inclusions: z.array(z.string()).min(1, "At least one inclusion is required"),

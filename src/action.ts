@@ -383,8 +383,12 @@ export async function editVisa(prevState: unknown, formData: FormData) {
     
     if (submission.status !== "success") {
       return submission.reply();
-    }
 
+    }
+    const  a = (submission.value.inclusions[0].split(",")).map((url) => url.replace("[",'').replace("]",''))
+    
+    // console.log(a)
+   
       
       
         await prisma.umrahPackage.create({
@@ -397,7 +401,7 @@ export async function editVisa(prevState: unknown, formData: FormData) {
             hotelMadinahRating: Number(submission.value.hotelMadinahRating),
             nightsInMakkah: Number(submission.value.nightsInMakkah),
             nightsInMadinah: Number(submission.value.nightsInMadinah),
-            transportation: submission.value.transportation,
+            inclusions: a,
             price: submission.value.price,
             image: submission.value.image,
 
@@ -428,11 +432,14 @@ export async function editVisa(prevState: unknown, formData: FormData) {
     }
   
     const packageId = formData.get("packageId") as string;
+    console.log(packageId)
+
+    const  a = (submission.value.inclusions[0].split(",")).map((url) => url.replace("[",'').replace("]",''))
+    
+    // console.log(a)
     
   
     const { ...updateData } = submission.value;
-  
-   
 
   
     try {
@@ -440,11 +447,47 @@ export async function editVisa(prevState: unknown, formData: FormData) {
         where: { id: packageId },
         data: {
           ...updateData,
+          inclusions: a,
         },
       });
     } catch (error) {
       return { error: { "": ["Failed to update travel package"] } };
     }
+    // console.log("redirecting")
+    revalidatePath("/dashboard/umrah-packages"); 
+    redirect("/dashboard/umrah-packages");
+  }
+
+
+
+  export async function deleteUmrahPackage(formData: FormData) {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
   
+    const id = formData.get("id") as string;
+    if (!id) {
+      return { error: "Package ID is required" };
+    }
+  
+    try {
+      const p = await prisma.umrahPackage.findUnique({
+        where: { id },
+        select: { image: true },
+      });
+  
+      if (p?.image) {
+        await deleteImage(p.image);
+      }
+  
+      await prisma.umrahPackage.delete({
+        where: { id },
+      });
+    } catch (error) {
+      return { error: "Failed to delete Umrah package" };
+    }
+  
+    revalidatePath("/dashboard/umrah-packages");
     redirect("/dashboard/umrah-packages");
   }

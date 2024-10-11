@@ -68,7 +68,7 @@ export default async function UmrahPackagesRoute() {
                 <TableHead>Price</TableHead>
                 <TableHead>Nights in Makkah</TableHead>
                 <TableHead>Nights in Madinah</TableHead>
-                <TableHead>Transportation</TableHead>
+                
                 <TableHead className="text-end">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -79,7 +79,7 @@ export default async function UmrahPackagesRoute() {
                   <TableCell>${pkg.price.toString()}</TableCell>
                   <TableCell>{pkg.nightsInMakkah}</TableCell>
                   <TableCell>{pkg.nightsInMadinah}</TableCell>
-                  <TableCell>{pkg.transportation ? 'Yes' : 'No'}</TableCell>
+                  
                   <TableCell className="text-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

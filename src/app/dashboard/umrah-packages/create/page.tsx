@@ -21,9 +21,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useFormState } from "react-dom";
-import { SubmitButton } from "@/components/SubmitButtons";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { createUmrahPackage } from "@/action";
+
+import { SubmitButton } from "@/components/SubmitButtons";
 
 export default function CreateUmrahPackagePage() {
   const [image, setImage] = useState<string | null>(null);
@@ -166,21 +167,13 @@ export default function CreateUmrahPackagePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <Checkbox
-              id={fields.transportation.id}
-              name={fields.transportation.name}
-              defaultChecked={fields.transportation.value ? true : false}
-            />
-            <Label htmlFor={fields.transportation.id}>Transportation Included</Label>
-          </div>
+         
 
           <div className="flex flex-col gap-3">
             <Label htmlFor={fields.price.id}>Price</Label>
             <Input
               id={fields.price.id}
               name={fields.price.name}
-              
               type="number"
               min="1"
               step="0.01"
