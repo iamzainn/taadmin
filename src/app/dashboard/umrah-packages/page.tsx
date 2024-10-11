@@ -65,7 +65,7 @@ export default async function UmrahPackagesRoute() {
             <TableHeader>
               <TableRow>
                 <TableHead>Title</TableHead>
-                <TableHead>Price</TableHead>
+                {/* <TableHead>Price</TableHead> */}
                 <TableHead>Nights in Makkah</TableHead>
                 <TableHead>Nights in Madinah</TableHead>
                 
@@ -76,7 +76,7 @@ export default async function UmrahPackagesRoute() {
               {packages.map((pkg) => (
                 <TableRow key={pkg.id}>
                   <TableCell className="font-medium">{pkg.title}</TableCell>
-                  <TableCell>${pkg.price.toString()}</TableCell>
+                  {/* <TableCell>${pkg.price.toString()}</TableCell> */}
                   <TableCell>{pkg.nightsInMakkah}</TableCell>
                   <TableCell>{pkg.nightsInMadinah}</TableCell>
                   
