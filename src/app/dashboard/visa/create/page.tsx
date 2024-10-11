@@ -29,7 +29,6 @@ import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
 
-export const dynamic = 'force-dynamic';
 
 interface Agent {
   id: string;
@@ -52,7 +51,9 @@ export default function VisaCreateRoute() {
 
   useEffect(() => {
     const fetchAgents = async () => {
-      const response = await fetch("/api/agents");
+      const response = await fetch("/api/agents", {
+        cache: "no-store",
+      });
       console.log(response)
       if (response.ok) {
         const data = await response.json();

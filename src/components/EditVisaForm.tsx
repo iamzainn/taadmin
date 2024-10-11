@@ -72,8 +72,8 @@ export default function VisaEditForm({ data }: VisaEditFormProps) {
     const fetchAgents = async () => {
       try {
         const response = await fetch("/api/agents", {
-          method: "GET",
-        });
+          cache: "no-store",
+        })
         if (response.ok) {
           const data = await response.json();
           console.log(data);
