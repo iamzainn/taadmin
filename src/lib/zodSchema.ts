@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 
@@ -62,9 +63,15 @@ export const umrahPackageSchema = z.object({
   nightsInMakkah: z.number().int().min(1, "At least one night in Makkah is required"),
   nightsInMadinah: z.number().int().min(1, "At least one night in Madinah is required"),
   
-  price: z.number().min(1, "Price must be at least 1"),
+  Double_Price: z.number().min(1, "Price must be at least 1"),
+  Quad_Price: z.number().min(1, "Price must be at least 1"),
+  Sharing_Price: z.number().min(1, "Price must be at least 1"),
+  Triple_Price: z.number().min(1, "Price must be at least 1"),  
+
   image: z.string().optional(),
   inclusions: z.array(z.string()).min(1, "At least one inclusion is required"),
 });
+
+
 
 export type UmrahPackageSchemaType = z.infer<typeof umrahPackageSchema>;

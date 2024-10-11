@@ -38,10 +38,12 @@ interface UmrahPackageFormProps {
   hotelMadinahRating: number;
   nightsInMakkah: number;
   nightsInMadinah: number;
- 
-  price: bigint;
   image: string | null;
   inclusions: string[];
+  Double_Price: bigint;
+  Quad_Price: bigint;
+  Sharing_Price: bigint;
+  Triple_Price: bigint;
   createdAt: Date;
   updatedAt: Date;
   }
@@ -85,8 +87,10 @@ export function EditUmrahForm({ data: initialData }: UmrahPackageFormProps) {
       image: initialData.image || "",
       inclusions: initialData.inclusions || [],
       nightsInMadinah: initialData.nightsInMadinah || 0,
-      price: Number(initialData.price) || 0,
-
+      Double_Price: Number(initialData.Double_Price) || 0,
+      Quad_Price: Number(initialData.Quad_Price) || 0,
+      Sharing_Price: Number(initialData.Sharing_Price) || 0,
+      Triple_Price: Number(initialData.Triple_Price) || 0,
 
      
 
@@ -231,17 +235,57 @@ export function EditUmrahForm({ data: initialData }: UmrahPackageFormProps) {
          
 
           <div className="flex flex-col gap-3">
-            <Label htmlFor={fields.price.id}>Price</Label>
+            <Label htmlFor={fields.Double_Price.id}>Double Price</Label>
             <Input
-              id={fields.price.id}
-              name={fields.price.name}
+              id={fields.Double_Price.id}
+              name={fields.Double_Price.name}
               type="number"
               min="1"
-              defaultValue={Number(initialData.price)}
+              defaultValue={Number(initialData.Double_Price.toString())}
               
               placeholder="Enter price"
             />
-            <p className="text-red-500">{fields.price.errors}</p>
+            <p className="text-red-500">{fields.Double_Price.errors}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.Quad_Price.id}>Quad Price</Label>
+            <Input
+              id={fields.Quad_Price.id}
+              name={fields.Quad_Price.name}
+              type="number"
+              min="1"
+              defaultValue={Number(initialData.Quad_Price.toString())}
+              
+              placeholder="Enter price"
+            />
+            <p className="text-red-500">{fields.Quad_Price.errors}</p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.Sharing_Price.id}>Sharing Price</Label>
+            <Input
+              id={fields.Sharing_Price.id}
+              name={fields.Sharing_Price.name}
+              type="number"
+              min="1"
+              defaultValue={Number(initialData.Sharing_Price.toString())}
+              
+              placeholder="Enter price"
+            />
+            <p className="text-red-500">{fields.Sharing_Price.errors}</p>
+          </div>
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.Triple_Price.id}>Triple Price</Label>
+            <Input
+              id={fields.Triple_Price.id}
+              name={fields.Triple_Price.name}
+              type="number"
+              min="1"
+              defaultValue={Number(initialData.Triple_Price.toString())}
+              
+              placeholder="Enter price"
+            />
+            <p className="text-red-500">{fields.Triple_Price.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">

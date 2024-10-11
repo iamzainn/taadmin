@@ -394,8 +394,7 @@ revalidatePath("/dashboard/visa");
 
     }
     const  a = (submission.value.inclusions[0].split(",")).map((url) => url.replace("[",'').replace("]",''))
-    
-    // console.log(a)
+   
    
       
       
@@ -410,7 +409,10 @@ revalidatePath("/dashboard/visa");
             nightsInMakkah: Number(submission.value.nightsInMakkah),
             nightsInMadinah: Number(submission.value.nightsInMadinah),
             inclusions: a,
-            price: submission.value.price,
+            Double_Price: Number(submission.value.Double_Price),
+            Quad_Price: Number(submission.value.Quad_Price),
+            Sharing_Price: Number(submission.value.Sharing_Price),
+            Triple_Price: Number(submission.value.Triple_Price),
             image: submission.value.image,
 
           },

@@ -170,16 +170,52 @@ export default function CreateUmrahPackagePage() {
          
 
           <div className="flex flex-col gap-3">
-            <Label htmlFor={fields.price.id}>Price</Label>
+            <Label htmlFor={fields.Double_Price.id}>Double Price</Label>
             <Input
-              id={fields.price.id}
-              name={fields.price.name}
+              id={fields.Double_Price.id}
+              name={fields.Double_Price.name}
               type="number"
               min="1"
-              step="0.01"
+              
             />
-            <p className="text-red-500">{fields.price.errors}</p>
+            <p className="text-red-500">{fields.Double_Price.errors}</p>
           </div>
+
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.Quad_Price.id}>Quad Price</Label>
+            <Input
+              id={fields.Quad_Price.id}
+              name={fields.Quad_Price.name}
+              type="number"
+              min="1"
+              
+            />
+            <p className="text-red-500">{fields.Quad_Price.errors}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.Sharing_Price.id}>Sharing Price</Label>
+            <Input
+              id={fields.Sharing_Price.id}
+              name={fields.Sharing_Price.name}
+              type="number"
+              min="1"
+            />
+            <p className="text-red-500">{fields.Sharing_Price.errors}</p>
+          </div>
+
+
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.Triple_Price.id}>Triple Price</Label>
+            <Input
+              id={fields.Triple_Price.id}
+              name={fields.Triple_Price.name}
+              type="number"
+              min="1"
+            />
+            <p className="text-red-500">{fields.Triple_Price.errors}</p>
+          </div>
+         
 
           <div className="flex flex-col gap-3">
             <Label>Package Inclusions</Label>
