@@ -30,7 +30,6 @@ import prisma from "@/lib/db";
 
 export const dynamic = 'force-dynamic';
 
-
 async function getVisas() {
   const visas = await prisma.visa.findMany({
     orderBy: {

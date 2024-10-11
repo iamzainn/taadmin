@@ -162,7 +162,7 @@ export default function VisaCreateRoute() {
 
             {/* Agent Selection */}
             <div className="flex flex-col gap-3">
-              <Label htmlFor="agentId">Agent</Label>
+              <Label htmlFor="agentId" id={Math.random().toString()}>Agent</Label>
               <Select name={fields.agentId.name}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select an agent" />

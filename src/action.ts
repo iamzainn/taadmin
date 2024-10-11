@@ -8,7 +8,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
 import { travelPackageSchema } from "../src/lib/zodSchema";
 import { revalidatePath } from "next/cache";
-// import { revalidatePath } from "next/cache";
+
 
 
 
@@ -43,7 +43,7 @@ export async function createBanner(prevState: unknown, formData: FormData) {
         
       },
     });
-  
+    revalidatePath("/dashboard/banner");
     redirect("/dashboard/banner");
   }
   
@@ -64,7 +64,7 @@ export async function createBanner(prevState: unknown, formData: FormData) {
 
     });
     
-  
+    revalidatePath("/dashboard/banner");
     redirect("/dashboard/banner");
   }
 
@@ -109,7 +109,8 @@ if (submission.status !== "success") {
         imageString:flattenUrls[0],
       }
     })
-  
+    
+    revalidatePath("/dashboard/packages");
     redirect("/dashboard/packages");
   }
 export async function deleteTravelPackage(formData: FormData) {
@@ -131,7 +132,7 @@ export async function deleteTravelPackage(formData: FormData) {
     },
   });
 
-  
+  revalidatePath("/dashboard/packages");
   redirect("/dashboard/packages");
 }
 
@@ -173,7 +174,8 @@ export async function editPackage(prevState: unknown, formData: FormData) {
   } catch (error) {
     return { error: { "": ["Failed to update travel package"] } };
   }
-
+  
+  revalidatePath("/dashboard/packages");
   redirect("/dashboard/packages");
 }
 
@@ -205,7 +207,7 @@ export async function createVisa(prevState: unknown, formData: FormData) {
     console.error("Failed to create visa:", error);
     return { message: "Failed to create visa" };
   }
-
+  revalidatePath("/dashboard/visa");
   redirect("/dashboard/visa");
 }
 
@@ -239,6 +241,8 @@ export async function editVisa(prevState: unknown, formData: FormData) {
     return { status: "error", message: "Failed to update visa" };
   }
 
+
+  revalidatePath("/dashboard/visa");
   redirect("/dashboard/visa");
 }
 
@@ -281,7 +285,7 @@ export async function editVisa(prevState: unknown, formData: FormData) {
       },
     });
   
-    
+revalidatePath("/dashboard/visa");
     redirect("/dashboard/visa");
   }
 
@@ -311,7 +315,7 @@ export async function editVisa(prevState: unknown, formData: FormData) {
       console.error("Failed to create agent:", error);
       return { status: 'error', message: "Failed to create agent" };
     }
-
+    revalidatePath("/dashboard/agent");
     redirect("/dashboard/agent");
 
   }
@@ -343,7 +347,8 @@ export async function editVisa(prevState: unknown, formData: FormData) {
       console.error("Failed to update agent:", error);
       return { status: 'error', message: "Failed to update agent" };
     }
-
+    
+    revalidatePath("/dashboard/agent");
     redirect("/dashboard/agent");
     
   }
@@ -367,6 +372,8 @@ export async function editVisa(prevState: unknown, formData: FormData) {
       console.error("Failed to delete agent:", error);
       return { status: 'error', message: "Failed to delete agent" };
     }
+
+    revalidatePath("/dashboard/agent");
     redirect("/dashboard/agent");
   }
 
