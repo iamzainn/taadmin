@@ -22,6 +22,7 @@ import { visaSchema } from "@/lib/zodSchema";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 import { ChevronLeft, XIcon } from "lucide-react";
+import { unstable_noStore as noStore } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -36,6 +37,7 @@ interface Agent {
 }
 
 export default function VisaCreateRoute() {
+  noStore();
   const [images, setImages] = useState<string[]>([]);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [, action] = useFormState(createVisa, undefined);

@@ -25,6 +25,8 @@ import { useFormState } from "react-dom";
 import { deleteImage, editVisa } from "@/action";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+import { unstable_noStore as noStore } from "next/cache";
+
 interface Agent {
   id: string;
   name: string;
@@ -44,6 +46,7 @@ interface VisaEditFormProps {
 }
 
 export default function VisaEditForm({ data }: VisaEditFormProps) {
+  noStore();
   const [images, setImages] = useState<string[]>(data.images);
   const [agents, setAgents] = useState<Agent[]>([]);
   const [, action] = useFormState(editVisa, undefined);
