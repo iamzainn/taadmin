@@ -27,6 +27,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
+
+export const dynamic = 'force-dynamic';
+
 interface Agent {
   id: string;
   name: string;
