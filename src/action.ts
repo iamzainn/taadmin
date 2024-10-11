@@ -119,6 +119,7 @@ export async function deleteTravelPackage(formData: FormData) {
   if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
 
   const packageId = formData.get("packageId") as string;
+  console.log(packageId)
   const images=formData.get("images") as string;
     const arrayImages = images.split(",")
 
