@@ -48,13 +48,15 @@ export default function VisaCreateRoute() {
   useEffect(() => {
     const fetchAgents = async () => {
       const response = await fetch("/api/agents");
+      console.log(response)
       if (response.ok) {
-        
         const data = await response.json();
         console.log(data);
+        
         setAgents(data);
       }
     };
+
     fetchAgents();
   }, []);
 
