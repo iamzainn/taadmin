@@ -216,7 +216,7 @@ export default function VisaCreateRoute() {
               ) : (
                 <UploadDropzone
                   endpoint="visaImageRoute"
-                  className="object-cover border rounded-lg bg-gray-600 flex items-center justify-center"
+                  // className="object-cover border rounded-lg bg-gray-600 flex items-center justify-center"
                   onClientUploadComplete={(res) => {
                     setImages(res.map((r) => r.url));
                   }}
