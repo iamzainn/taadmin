@@ -3,8 +3,8 @@ import { Metadata } from 'next';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { LoadingSkeleton } from '@/components/Orders/loadingSkelton';
-import TravelOrderTabs from '@/components/Orders/TravelOrderTabs';
+import { LoadingSkeleton } from '@/components/TravelOrders/loadingSkelton';
+import TravelOrderTabs from '@/components/TravelOrders/TravelOrderTabs';
 
 
 export const metadata: Metadata = {

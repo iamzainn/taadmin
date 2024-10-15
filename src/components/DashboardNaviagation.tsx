@@ -5,16 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
+  
   {
-    name: "Dashboard",
-    href: "/dashboard",
+    name: "Travel Orders",
+    href: "/dashboard/TravelOrders",
   },
   {
-    name: "orders",
-    href: "/dashboard/orders",
-  },
-  {
-    name: "Packages",
+    name: "Travel Packages",
     href: "/dashboard/packages",
   },
   {
@@ -30,8 +27,12 @@ const links = [
     href:"/dashboard/agent"
    },
    {
-    name:"umrah",
+    name:"Umrah Packages",
     href:"/dashboard/umrah-packages"
+   },
+   {
+    name:"Umrah Orders",
+    href:"/dashboard/UmrahOrders"
    }
 ];
 

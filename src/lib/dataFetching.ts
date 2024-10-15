@@ -1,4 +1,4 @@
-import prisma from "./db";
+import prisma from "../lib/db";
 
 
 export async function getCustomTravelOrders(page: number) {
@@ -44,3 +44,60 @@ export async function getTravelPackageSubscriptions(page: number) {
     throw new Error("Failed to fetch travel package subscriptions");
   }
 }
+
+
+export async function getCustomUmrahOrders(page: number) {
+  const pageSize = 10;
+  const skip = (page - 1) * pageSize;
+
+  try {
+    const [orders, totalCount] = await Promise.all([
+      prisma.customUmrahPackages.findMany({
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.customUmrahPackages.count(),
+    ]);
+
+    return { 
+      orders, 
+      totalCount, 
+      totalPages: Math.ceil(totalCount / pageSize) 
+    };
+  } catch (error) {
+    console.error("Error fetching custom Umrah orders:", error);
+    throw new Error("Failed to fetch custom Umrah orders");
+  }
+}
+
+export async function getUmrahPackageSubscriptions(page: number) {
+  const pageSize = 10;
+  const skip = (page - 1) * pageSize;
+
+  try {
+    const [subscriptions, totalCount] = await Promise.all([
+      prisma.umrahPackageSubscription.findMany({
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+        include: { UmrahPackage: true },
+      }),
+      prisma.umrahPackageSubscription.count(),
+    ]);
+
+    return { 
+      subscriptions, 
+      totalCount, 
+      totalPages: Math.ceil(totalCount / pageSize) 
+    };
+  } catch (error) {
+    console.error("Error fetching Umrah package subscriptions:", error);
+    throw new Error("Failed to fetch Umrah package subscriptions");
+  }
+}
+
+
+
+
+

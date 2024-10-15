@@ -117,6 +117,7 @@ model CustomUmrahPackages {
   CustomerName String
   phoneNumber  String
   email        String
+  createdAt   DateTime     @default(now())
 }
 
 model UmrahPackage {

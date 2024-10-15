@@ -22,7 +22,6 @@ export function DataTableCustomTravel({ data }: DataTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
             <TableHead>First Name</TableHead>
             <TableHead>Last Name</TableHead>
             <TableHead>Email</TableHead>
@@ -32,14 +31,14 @@ export function DataTableCustomTravel({ data }: DataTableProps) {
             <TableHead>Destination</TableHead>
             <TableHead>Travel Start Date</TableHead>
             <TableHead>Travel End Date</TableHead>
-            <TableHead>Created At</TableHead>
+            
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length > 0 ? (
             data.map((booking) => (
               <TableRow key={booking.id}>
-                <TableCell>{booking.id}</TableCell>
+                
                 <TableCell>{booking.firstName}</TableCell>
                 <TableCell>{booking.lastName}</TableCell>
                 <TableCell>{booking.email}</TableCell>
@@ -49,7 +48,7 @@ export function DataTableCustomTravel({ data }: DataTableProps) {
                 <TableCell>{booking.Destination}</TableCell>
                 <TableCell>{format(new Date(booking.travelStartDate), 'PP')}</TableCell>
                 <TableCell>{format(new Date(booking.travelEndDate), 'PP')}</TableCell>
-                <TableCell>{format(new Date(booking.createdAt), 'PP')}</TableCell>
+                
               </TableRow>
             ))
           ) : (
