@@ -63,7 +63,7 @@ export default async function BannerRoute() {
             <TableHeader>
               <TableRow>
                 <TableHead>Image</TableHead>
-                <TableHead>Title</TableHead>
+                
                 <TableHead className="text-end">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -80,7 +80,7 @@ export default async function BannerRoute() {
                       className="rounded-lg object-cover h-16 w-16"
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{item.title}</TableCell>
+                 
                   <TableCell className="text-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

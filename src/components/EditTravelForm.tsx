@@ -22,56 +22,63 @@ import { parseWithZod } from "@conform-to/zod";
 import { SubmitButton } from "./SubmitButtons";
 import { travelPackageSchema } from "@/lib/zodSchema";
 import { UploadDropzone } from "@/lib/uploadthing";
-import {JsonValue } from "@prisma/client/runtime/library";
+import { JsonValue } from "@prisma/client/runtime/library";
 
 import { deleteImage, editPackage } from "@/action";
+import { Switch } from "./ui/switch";
 
 interface EditTravelFormProps {
-    data: {
-      id: string;
-      name: string;
-      durationInDays: number;
-      departureCity: string;
-      arrivalCity: string;
-      price: bigint;
-      images: string[];
-      dailyDetails: JsonValue;
-      overview: string;
-      createdAt: Date;
-      updatedAt: Date;
-    };
-  }
+  data: {
+    id: string;
+    name: string;
+    durationInDays: number;
+    departureFrom: string;
+    arrival: string;
+    price: bigint;
+    images: string[];
+    dailyDetails: JsonValue;
+    overview: string;
+    isFeatured: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  };
+}
 export function EditForm({ data }: EditTravelFormProps) {
-    const [images, setImages] = useState<string[]>(data.images);
-    const [dailyDetails, setDailyDetails] = useState<string[]>(data.dailyDetails as string[]);
-    const [lastResult, action] = useFormState(editPackage, null);
-  
-    const [form, fields] = useForm({
-      lastResult,
-      onValidate({ formData }) {
-        // console.log(formData + "onvalidate")
-        return parseWithZod(formData, { schema: travelPackageSchema });
-      },
+  const [images, setImages] = useState<string[]>(data.images);
+  const [dailyDetails, setDailyDetails] = useState<string[]>(
+    data.dailyDetails as string[]
+  );
+  const [lastResult, action] = useFormState(editPackage, null);
 
-      
-      shouldValidate: "onBlur",
-      shouldRevalidate: "onInput",
-      defaultValue: {
-        name: data.name,
-        durationInDays: data.durationInDays.toString(),
-        departureCity: data.departureCity,
-        arrivalCity: data.arrivalCity,
-        price: data.price.toString(),
-        overview: data.overview,    
-      },
-    });
+  const [form, fields] = useForm({
+    lastResult,
+    onValidate({ formData }) {
+      // console.log(formData + "onvalidate")
+      return parseWithZod(formData, { schema: travelPackageSchema });
+    },
+
+    shouldValidate: "onBlur",
+    shouldRevalidate: "onInput",
+    defaultValue: {
+      name: data.name,
+      durationInDays: data.durationInDays.toString(),
+      departureFrom: data.departureFrom,
+      arrival: data.arrival,
+      isFeatured: data.isFeatured,
+      price: data.price.toString(),
+      overview: data.overview,
+    },
+  });
 
   useEffect(() => {
     const durationValue = parseInt(fields.durationInDays.value || "1", 10);
-    setDailyDetails(prevDetails => {
+    setDailyDetails((prevDetails) => {
       const newDetails = [...prevDetails];
       if (durationValue > newDetails.length) {
-        return [...newDetails, ...Array(durationValue - newDetails.length).fill("")];
+        return [
+          ...newDetails,
+          ...Array(durationValue - newDetails.length).fill(""),
+        ];
       } else if (durationValue < newDetails.length) {
         return newDetails.slice(0, durationValue);
       }
@@ -80,7 +87,7 @@ export function EditForm({ data }: EditTravelFormProps) {
   }, [fields.durationInDays.value]);
 
   const handleDailyDetailChange = (index: number, value: string) => {
-    setDailyDetails(prevDetails => {
+    setDailyDetails((prevDetails) => {
       const newDetails = [...prevDetails];
       newDetails[index] = value;
       return newDetails;
@@ -88,24 +95,25 @@ export function EditForm({ data }: EditTravelFormProps) {
   };
 
   const handleDelete = async (imageUrl: string) => {
-    const result= await deleteImage(imageUrl)
- 
-     if (result.status === "success") {
-       setImages((prev) => prev.filter((url) => url !== imageUrl));
-     }
-   
-   };
+    const result = await deleteImage(imageUrl);
+
+    if (result.status === "success") {
+      setImages((prev) => prev.filter((url) => url !== imageUrl));
+    }
+  };
 
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={action}>
-        <input type="hidden" name="packageId" value={data.id} />
+      <input type="hidden" name="packageId" value={data.id} />
       <div className="flex items-center gap-x-4 mb-6">
         <Button variant="outline" size="icon" asChild>
           <Link href="/dashboard/packages">
             <ChevronLeft className="w-4 h-4" />
           </Link>
         </Button>
-        <h1 className="text-xl font-semibold tracking-tight">Edit Travel Package</h1>
+        <h1 className="text-xl font-semibold tracking-tight">
+          Edit Travel Package
+        </h1>
       </div>
 
       <Card>
@@ -138,25 +146,25 @@ export function EditForm({ data }: EditTravelFormProps) {
           </div>
 
           <div className="flex flex-col gap-3">
-            <Label htmlFor={fields.departureCity.id}>Departure City</Label>
+            <Label htmlFor={fields.departureFrom.id}>Departure City</Label>
             <Input
-              id={fields.departureCity.id}
-              name={fields.departureCity.name}
-              defaultValue={fields.departureCity.initialValue}
+              id={fields.departureFrom.id}
+              name={fields.departureFrom.name}
+              defaultValue={fields.departureFrom.initialValue}
               placeholder="Enter departure city"
             />
-            <p className="text-red-500">{fields.departureCity.errors}</p>
+            <p className="text-red-500">{fields.departureFrom.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">
-            <Label htmlFor={fields.arrivalCity.id}>Arrival City</Label>
+            <Label htmlFor={fields.arrival.id}>Arrival City</Label>
             <Input
-              id={fields.arrivalCity.id}
-              name={fields.arrivalCity.name}
-              defaultValue={fields.arrivalCity.initialValue}
+              id={fields.arrival.id}
+              name={fields.arrival.name}
+              defaultValue={fields.arrival.initialValue}
               placeholder="Enter arrival city"
             />
-            <p className="text-red-500">{fields.arrivalCity.errors}</p>
+            <p className="text-red-500">{fields.arrival.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -168,11 +176,23 @@ export function EditForm({ data }: EditTravelFormProps) {
                   id={`daily-detail-${index}`}
                   name={`${fields.dailyDetails.name}[${index}]`}
                   value={detail}
-                  onChange={(e) => handleDailyDetailChange(index, e.target.value)}
+                  onChange={(e) =>
+                    handleDailyDetailChange(index, e.target.value)
+                  }
                   placeholder={`Enter details for day ${index + 1}`}
                 />
               </div>
             ))}
+
+            <div className="flex flex-col gap-3">
+              <Label>Featured Product</Label>
+              <Switch
+                key={fields.isFeatured.key}
+                name={fields.isFeatured.name}
+                defaultValue={fields.isFeatured.initialValue}
+              />
+              <p className="text-red-500">{fields.isFeatured.errors}</p>
+            </div>
             <input
               type="hidden"
               name={fields.dailyDetails.name}
@@ -200,7 +220,6 @@ export function EditForm({ data }: EditTravelFormProps) {
               defaultValue={fields.price.initialValue}
               type="number"
               min="1"
-              step="0.01"
             />
             <p className="text-red-500">{fields.price.errors}</p>
           </div>
@@ -209,7 +228,7 @@ export function EditForm({ data }: EditTravelFormProps) {
             <Label>Images</Label>
             <input
               type="hidden"
-              value={images.join(',')}
+              value={images.join(",")}
               name={fields.images.name}
             />
             {images.length > 0 ? (
@@ -240,7 +259,7 @@ export function EditForm({ data }: EditTravelFormProps) {
                   setImages(res.map((r) => r.url));
                 }}
                 onUploadError={() => {
-                  alert("Something went wrong");
+                  alert("image not uploaded");
                 }}
               />
             )}

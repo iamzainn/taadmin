@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UploadDropzone } from "@/lib/uploadthing";
@@ -57,7 +57,7 @@ export default function BannerRoute() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-y-6">
-            <div className="flex flex-col gap-3">
+            {/* <div className="flex flex-col gap-3">
               <Label>Title</Label>
               <Input
                 name={fields.title.name}
@@ -67,9 +67,9 @@ export default function BannerRoute() {
                 placeholder="Create title for Banner"
               />
               <p className="text-red-500">{fields.title.errors}</p>
-            </div>
+            </div> */}
 
-            <div className="flex flex-col gap-3">
+            {/* <div className="flex flex-col gap-3">
               <Label>Sub Title</Label>
               <Input
                 name={fields.subtitle.name}
@@ -79,10 +79,10 @@ export default function BannerRoute() {
                 placeholder="Create Subtitle for Banner"
               />
               <p className="text-red-500">{fields.subtitle.errors}</p>
-            </div>
+            </div> */}
 
             <div className="flex flex-col gap-3">
-              <Label>Banner for</Label>
+              <Label>Banner For</Label>
               <Select 
                 name={fields.for.name}
                 key={fields.for.key}
@@ -111,7 +111,7 @@ export default function BannerRoute() {
               {image !== undefined ? (
                 <Image
                   src={image}
-                  alt="Product Image"
+                  alt="Banner image"
                   width={200}
                   height={200}
                   className="w-[200px] h-[200px] object-cover border rounded-lg"

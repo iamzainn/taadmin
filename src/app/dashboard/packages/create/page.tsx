@@ -22,6 +22,7 @@ import { useState, useEffect } from "react";
 import { useFormState } from "react-dom";
 import { SubmitButton } from "@/components/SubmitButtons";
 import { createTravelPackage } from "@/action";
+import { Switch } from "@/components/ui/switch";
 
 export default function CreateTravelPackagePage() {
   const [images, setImages] = useState<string[]>([]);
@@ -102,26 +103,27 @@ export default function CreateTravelPackagePage() {
             <p className="text-red-500">{fields.durationInDays.errors}</p>
           </div>
 
+
           <div className="flex flex-col gap-3">
-            <Label htmlFor={fields.departureCity.id}>Departure City</Label>
+            <Label htmlFor={fields.departureFrom.id}>Departure City</Label>
             <Input
-              id={fields.departureCity.id}
-              name={fields.departureCity.name}
-              defaultValue={fields.departureCity.initialValue}
+              id={fields.departureFrom.id}
+              name={fields.departureFrom.name}
+              defaultValue={fields.departureFrom.initialValue}
               placeholder="Enter departure city"
             />
-            <p className="text-red-500">{fields.departureCity.errors}</p>
+            <p className="text-red-500">{fields.departureFrom.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">
-            <Label htmlFor={fields.arrivalCity.id}>Arrival City</Label>
+            <Label htmlFor={fields.arrival.id}>Arrival City</Label>
             <Input
-              id={fields.arrivalCity.id}
-              name={fields.arrivalCity.name}
-              defaultValue={fields.arrivalCity.initialValue}
+              id={fields.arrival.id}
+              name={fields.arrival.name}
+              defaultValue={fields.arrival.initialValue}
               placeholder="Enter arrival city"
             />
-            <p className="text-red-500">{fields.arrivalCity.errors}</p>
+            <p className="text-red-500">{fields.arrival.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -145,6 +147,16 @@ export default function CreateTravelPackagePage() {
             />
             <p className="text-red-500">{fields.dailyDetails.errors}</p>
           </div>
+
+          <div className="flex flex-col gap-3">
+              <Label>Featured Product</Label>
+              <Switch
+                key={fields.isFeatured.key}
+                name={fields.isFeatured.name}
+                // defaultValue={fields.isFeatured.initialValue}
+              />
+              <p className="text-red-500">{fields.isFeatured.errors}</p>
+            </div>
 
           <div className="flex flex-col gap-3">
             <Label htmlFor={fields.overview.id}>Overview</Label>

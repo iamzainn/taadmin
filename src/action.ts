@@ -10,11 +10,7 @@ import { travelPackageSchema } from "../src/lib/zodSchema";
 import { revalidatePath } from "next/cache";
 
 
-
-
 const utapi = new UTApi();
-
-
 
 
 export async function createBanner(prevState: unknown, formData: FormData) {
@@ -36,9 +32,8 @@ export async function createBanner(prevState: unknown, formData: FormData) {
   
     await prisma.banner.create({
       data: {
-        title: submission.value.title,
+        
         imageString: submission.value.imageString,
-        subtitle: submission.value.subtitle,
         For: submission.value.for
         
       },
@@ -95,20 +90,16 @@ if (submission.status !== "success") {
       data: {
         name: submission.value.name,
         durationInDays: submission.value.durationInDays,
-        departureCity: submission.value.departureCity,
-        arrivalCity: submission.value.arrivalCity,
+        departureFrom: submission.value.departureFrom,
+        arrival: submission.value.arrival,
         dailyDetails: dailyDetails,
         overview: submission.value.overview,
         images: flattenUrls,
+        isFeatured: submission.value.isFeatured === true ? true : false,
         price: submission.value.price,
       },
     });
-    await prisma.countries.create({
-      data: {
-        name: submission.value.arrivalCity,
-        imageString:flattenUrls[0],
-      }
-    })
+    
     
     revalidatePath("/dashboard/packages");
     redirect("/dashboard/packages");
@@ -170,6 +161,7 @@ export async function editPackage(prevState: unknown, formData: FormData) {
         images: flattenUrls,
         dailyDetails,
         price:(updateData.price),
+        isFeatured: submission.value.isFeatured === true ? true : false,
       },
     });
   } catch (error) {
@@ -179,7 +171,6 @@ export async function editPackage(prevState: unknown, formData: FormData) {
   revalidatePath("/dashboard/packages");
   redirect("/dashboard/packages");
 }
-
 
 export async function createVisa(prevState: unknown, formData: FormData) {
   const user = await currentUser();

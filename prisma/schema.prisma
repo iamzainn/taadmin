@@ -9,12 +9,9 @@ datasource db {
 
 model Banner {
   id          String   @id @default(uuid())
-  title       String
   imageString String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  ctaText     String?
-  subtitle    String?
   For         String?
 }
 
@@ -24,12 +21,13 @@ model TravelPackage {
   price               BigInt
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
-  arrivalCity         String
   dailyDetails        Json                  @default("[]")
-  departureCity       String
   durationInDays      Int
   overview            String
   images              String[]
+  arrival             String
+  departureFrom       String
+  isFeatured          Boolean
   PackageSubscription PackageSubscription[]
 }
 
@@ -47,18 +45,13 @@ model PackageSubscription {
 }
 
 model TravelCustomBooking {
-  id              String   @id
-  firstName       String
-  lastName        String
-  email           String
-  phoneNumber     String
-  country         String
-  pickUpLocation  String
-  Destination     String
-  travelStartDate DateTime
-  travelEndDate   DateTime
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime
+  id          String   @id
+  name        String
+  email       String?
+  phoneNumber String
+  country     String
+  Destination String
+  createdAt   DateTime @default(now())
 }
 
 model Countries {
@@ -110,14 +103,14 @@ model CustomUmrahPackages {
   hotelName    String
   checkIn      DateTime
   checkOut     DateTime
-  rooms        Int
+  rooms        Json
   nights       Int
-  Sector       String
+  sector       String
   VehicleType  String
   CustomerName String
   phoneNumber  String
   email        String
-  createdAt   DateTime     @default(now())
+  travellers   Json
 }
 
 model UmrahPackage {
@@ -130,14 +123,14 @@ model UmrahPackage {
   hotelMadinahRating       Int
   nightsInMakkah           Int
   nightsInMadinah          Int
+  Sharing_Price            BigInt
+  Quad_Price               BigInt
+  Triple_Price             BigInt
+  Double_Price             BigInt
   image                    String?
   inclusions               String[]
   createdAt                DateTime                   @default(now())
   updatedAt                DateTime                   @updatedAt
-  Double_Price             BigInt
-  Quad_Price               BigInt
-  Sharing_Price            BigInt
-  Triple_Price             BigInt
   UmrahPackageSubscription UmrahPackageSubscription[]
 }
 

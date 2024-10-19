@@ -10,7 +10,7 @@ const f = createUploadthing();
 
 
 export const ourFileRouter = {
-    bannerImageRoute: f({ image: { maxFileSize: "8MB",maxFileCount:1 } })
+    bannerImageRoute: f({ image: { maxFileSize: "1MB",maxFileCount:1 } })
     
     .middleware(async ({ }) => {
   

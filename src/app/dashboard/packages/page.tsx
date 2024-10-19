@@ -78,7 +78,7 @@ export default async function PackagesRoute() {
                   <TableCell className="font-medium">{pkg.name}</TableCell>
                   <TableCell>${pkg.price.toString()}</TableCell>
                   <TableCell>{pkg.durationInDays} days</TableCell>
-                  <TableCell>{pkg.arrivalCity || 'N/A'}</TableCell>
+                  <TableCell>{pkg.arrival|| 'N/A'}</TableCell>
                   <TableCell className="text-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
