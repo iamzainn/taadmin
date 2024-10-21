@@ -76,7 +76,7 @@ export default async function PackagesRoute() {
               {packages.map((pkg) => (
                 <TableRow key={pkg.id}>
                   <TableCell className="font-medium">{pkg.name}</TableCell>
-                  <TableCell>${pkg.price.toString()}</TableCell>
+                  <TableCell>PKR {pkg.price.toString()}</TableCell>
                   <TableCell>{pkg.durationInDays} days</TableCell>
                   <TableCell>{pkg.arrival|| 'N/A'}</TableCell>
                   <TableCell className="text-end">

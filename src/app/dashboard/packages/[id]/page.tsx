@@ -4,6 +4,7 @@ import prisma from "@/lib/db";
 import { EditForm } from "@/components/EditTravelForm";
 
 
+
 async function getData(productId: string) {
   const data = await prisma.travelPackage.findUnique({
     where: {
@@ -28,5 +29,7 @@ export default async function EditRoute({
 }) {
   noStore();
   const data = await getData(params.id);
+   console.log(data);
+
   return <EditForm data={data} />;
 }

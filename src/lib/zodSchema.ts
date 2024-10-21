@@ -19,7 +19,7 @@ export const travelPackageSchema = z.object({
   dailyDetails: z.array(z.string().min(1, "Daily detail is required")).min(1, "At least one daily detail is required"),
   overview: z.string().min(10, "Overview must be at least 10 characters long"),
   images: z.array(z.string()).min(1, "At least one image is required"),
-  isFeatured : z.boolean(),
+  isFeatured : z.boolean().optional(),
   price: z.number().min(1, "Price must be at least 1"),
 });
 
@@ -33,7 +33,7 @@ export const visaSchema = z.object({
   images: z.array(z.string().url("Invalid image URL")).min(1, "At least one image is required"),
   pricing: z.coerce.number().int().positive("Pricing must be a positive integer"),
   visaValidity: z.coerce.number().int().positive("Visa validity must be a positive integer"),
-  agentId: z.string().min(1, "Agent is required"),
+  
 });
 export type VisaSchemaType = z.infer<typeof visaSchema>;
 

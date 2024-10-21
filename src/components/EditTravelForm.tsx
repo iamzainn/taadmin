@@ -189,7 +189,7 @@ export function EditForm({ data }: EditTravelFormProps) {
               <Switch
                 key={fields.isFeatured.key}
                 name={fields.isFeatured.name}
-                defaultValue={fields.isFeatured.initialValue}
+                defaultChecked={data.isFeatured}
               />
               <p className="text-red-500">{fields.isFeatured.errors}</p>
             </div>

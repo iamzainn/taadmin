@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 import { UploadDropzone } from "@/lib/uploadthing";
@@ -25,20 +25,20 @@ import { ChevronLeft, XIcon } from "lucide-react";
 import { unstable_noStore as noStore } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useFormState } from "react-dom";
 
 
 
-interface Agent {
-  id: string;
-  name: string;
-}
+// interface Agent {
+//   id: string;
+//   name: string;
+// }
 
 export default function VisaCreateRoute() {
   noStore();
   const [images, setImages] = useState<string[]>([]);
-  const [agents, setAgents] = useState<Agent[]>([]);
+
   const [, action] = useFormState(createVisa, undefined);
 
   const [form, fields] = useForm({
@@ -49,22 +49,22 @@ export default function VisaCreateRoute() {
     shouldRevalidate: "onInput",
   });
 
-  useEffect(() => {
-    const fetchAgents = async () => {
-      const response = await fetch("/api/agents", {
-        cache: "no-store",
-      });
-      console.log(response)
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
+  // useEffect(() => {
+  //   const fetchAgents = async () => {
+  //     const response = await fetch("/api/agents", {
+  //       cache: "no-store",
+  //     });
+  //     console.log(response)
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data);
         
-        setAgents(data);
-      }
-    };
+  //       setAgents(data);
+  //     }
+  //   };
 
-    fetchAgents();
-  }, []);
+  //   fetchAgents();
+  // }, []);
 
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
@@ -164,7 +164,7 @@ export default function VisaCreateRoute() {
             </div>
 
             {/* Agent Selection */}
-            <div className="flex flex-col gap-3">
+            {/* <div className="flex flex-col gap-3">
               <Label htmlFor="agentId" id={Math.random().toString()}>Agent</Label>
               <Select name={fields.agentId.name}>
                 <SelectTrigger>
@@ -181,7 +181,7 @@ export default function VisaCreateRoute() {
               {fields.agentId.errors && (
                 <p className="text-red-500">{fields.agentId.errors}</p>
               )}
-            </div>
+            </div> */}
 
             {/* Images */}
             <div className="flex flex-col gap-3">
