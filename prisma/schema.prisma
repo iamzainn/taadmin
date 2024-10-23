@@ -28,6 +28,7 @@ model TravelPackage {
   arrival             String
   departureFrom       String
   isFeatured          Boolean
+  categories          String[]              @default([])
   PackageSubscription PackageSubscription[]
 }
 

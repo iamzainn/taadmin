@@ -24,10 +24,31 @@ import { SubmitButton } from "@/components/SubmitButtons";
 import { createTravelPackage } from "@/action";
 import { Switch } from "@/components/ui/switch";
 
+const PACKAGE_CATEGORIES = [
+  "Student Adventure Tours",
+  "Hot Deals Tours",
+  "Luxury Travel Packages",
+  "Religious/Pilgrimage Tours",
+  "Honeymoon Packages",
+] as const;
+
 export default function CreateTravelPackagePage() {
   const [images, setImages] = useState<string[]>([]);
   const [dailyDetails, setDailyDetails] = useState<string[]>([""]);
   const [lastResult, action] = useFormState(createTravelPackage, undefined);
+  const [selectedCategories,setSelectedCategories] = useState<string []>([]);
+
+  const handleCategoryChange = (category: string) => {
+    if (!selectedCategories.includes(category)) {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  const removeCategory = (categoryToRemove: string) => {
+    setSelectedCategories(
+      selectedCategories.filter((cat) => cat !== categoryToRemove)
+    );
+  };
 
   const [form, fields] = useForm({
     lastResult,
@@ -40,10 +61,13 @@ export default function CreateTravelPackagePage() {
 
   useEffect(() => {
     const durationValue = parseInt(fields.durationInDays.value || "1", 10);
-    setDailyDetails(prevDetails => {
+    setDailyDetails((prevDetails) => {
       const newDetails = [...prevDetails];
       if (durationValue > newDetails.length) {
-        return [...newDetails, ...Array(durationValue - newDetails.length).fill("")];
+        return [
+          ...newDetails,
+          ...Array(durationValue - newDetails.length).fill(""),
+        ];
       } else if (durationValue < newDetails.length) {
         return newDetails.slice(0, durationValue);
       }
@@ -52,7 +76,7 @@ export default function CreateTravelPackagePage() {
   }, [fields.durationInDays.value]);
 
   const handleDailyDetailChange = (index: number, value: string) => {
-    setDailyDetails(prevDetails => {
+    setDailyDetails((prevDetails) => {
       const newDetails = [...prevDetails];
       newDetails[index] = value;
       return newDetails;
@@ -71,7 +95,9 @@ export default function CreateTravelPackagePage() {
             <ChevronLeft className="w-4 h-4" />
           </Link>
         </Button>
-        <h1 className="text-xl font-semibold tracking-tight">New Travel Package</h1>
+        <h1 className="text-xl font-semibold tracking-tight">
+          New Travel Package
+        </h1>
       </div>
 
       <Card>
@@ -102,7 +128,6 @@ export default function CreateTravelPackagePage() {
             />
             <p className="text-red-500">{fields.durationInDays.errors}</p>
           </div>
-
 
           <div className="flex flex-col gap-3">
             <Label htmlFor={fields.departureFrom.id}>Departure City</Label>
@@ -135,7 +160,9 @@ export default function CreateTravelPackagePage() {
                   id={`daily-detail-${index}`}
                   name={`${fields.dailyDetails.name}[${index}]`}
                   value={detail}
-                  onChange={(e) => handleDailyDetailChange(index, e.target.value)}
+                  onChange={(e) =>
+                    handleDailyDetailChange(index, e.target.value)
+                  }
                   placeholder={`Enter details for day ${index + 1}`}
                 />
               </div>
@@ -149,36 +176,65 @@ export default function CreateTravelPackagePage() {
           </div>
 
           <div className="flex flex-col gap-3">
-              <Label>Featured Product</Label>
-              <Switch
-                key={fields.isFeatured.key}
-                name={fields.isFeatured.name}
-                // defaultValue={fields.isFeatured.initialValue}
-              />
-              <p className="text-red-500">{fields.isFeatured.errors}</p>
-            </div>
-
-          <div className="flex flex-col gap-3">
-            <Label htmlFor={fields.overview.id}>Overview</Label>
-            <Textarea
-              id={fields.overview.id}
-              name={fields.overview.name}
-              defaultValue={fields.overview.initialValue}
-              placeholder="Enter package overview"
+            <Label>Featured Product</Label>
+            <Switch
+              key={fields.isFeatured.key}
+              name={fields.isFeatured.name}
             />
-            <p className="text-red-500">{fields.overview.errors}</p>
+            <p className="text-red-500">{fields.isFeatured.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">
-            <Label htmlFor={fields.price.id}>Pricing</Label>
-            <Input
-              id={fields.price.id}
-              name={fields.price.name}
-              defaultValue={fields.price.initialValue}
-              type="number"
-              min="1"
-            />
-            <p className="text-red-500">{fields.price.errors}</p>
+            <Label>Package Categories</Label>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2 mb-2">
+                {selectedCategories.map((category) => (
+                  <div
+                    key={category}
+                    className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                  >
+                    {category}
+                    <button
+                      type="button"
+                      onClick={() => removeCategory(category)}
+                      className="hover:bg-primary/20 rounded-full p-1"
+                    >
+                      <XIcon className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {selectedCategories.length < PACKAGE_CATEGORIES.length && (
+                <select
+                  className="w-full rounded-md border border-input bg-background px-3 py-2"
+                  onChange={(e) => {
+                    const value = e.target.value
+                    if (value) {
+                      handleCategoryChange(value);
+                      e.target.value = ""; // Reset select after selection
+                    }
+                  }}
+                  value=""
+                >
+                  <option value="">Select a category</option>
+                  {PACKAGE_CATEGORIES.filter(
+                    (cat) => !selectedCategories.includes(cat)
+                  ).map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <input
+                type="hidden"
+                name={fields.categories.name}
+                value={JSON.stringify(selectedCategories)}
+              />
+            </div>
+            <p className="text-red-500">{fields.categories.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">

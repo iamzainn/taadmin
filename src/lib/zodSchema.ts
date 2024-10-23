@@ -20,6 +20,7 @@ export const travelPackageSchema = z.object({
   overview: z.string().min(10, "Overview must be at least 10 characters long"),
   images: z.array(z.string()).min(1, "At least one image is required"),
   isFeatured : z.boolean().optional(),
+  categories: z.array(z.string()).min(1, "At least one category is required"),
   price: z.number().min(1, "Price must be at least 1"),
 });
 
