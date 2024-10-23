@@ -70,36 +70,35 @@ export async function createBanner(prevState: unknown, formData: FormData) {
   export async function createTravelPackage(prevState: unknown, formData: FormData) {
     const user = await currentUser()
     if (!user ) throw new Error("Unauthorized");
-   
+    
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
-
-const submission = parseWithZod(formData, {
-  schema: travelPackageSchema,
-});
-
-if (submission.status !== "success") {
-  return submission.reply();
-}
-    const flattenUrls = submission.value.images.flatMap((urlString) =>
-      urlString.split(",").map((url) => url.trim())
-    );
+  
+    const submission = parseWithZod(formData, {
+      schema: travelPackageSchema,
+    });
+  
+    if (submission.status !== "success") {
+      return submission.reply();
+    }
   
     const dailyDetails = JSON.parse(formData.get("dailyDetails") as string);
+    const categories = JSON.parse(formData.get('categories') as string);
+    const images = JSON.parse(formData.get('images') as string);
   
     await prisma.travelPackage.create({
       data: {
         name: submission.value.name,
+        price: BigInt(submission.value.price),
         durationInDays: submission.value.durationInDays,
         departureFrom: submission.value.departureFrom,
         arrival: submission.value.arrival,
-        dailyDetails: dailyDetails,
+        dailyDetails,
         overview: submission.value.overview,
-        images: flattenUrls,
-        isFeatured: submission.value.isFeatured === true ? true : false,
-        price: submission.value.price,
+        images,
+        isFeatured: submission.value.isFeatured ?? false,
+        categories,
       },
     });
-    
     
     revalidatePath("/dashboard/packages");
     redirect("/dashboard/packages");
@@ -129,13 +128,12 @@ export async function deleteTravelPackage(formData: FormData) {
 }
 
 export async function editPackage(prevState: unknown, formData: FormData) {
-  
   const user = await currentUser()
   if (!user ) throw new Error("Unauthorized");
   if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
 
   const submission = parseWithZod(formData, {
-    schema:travelPackageSchema,
+    schema: travelPackageSchema,
   });
 
   if (submission.status !== "success") {
@@ -143,25 +141,27 @@ export async function editPackage(prevState: unknown, formData: FormData) {
   }
 
   const packageId = formData.get("packageId") as string;
-  
-
   const { ...updateData } = submission.value;
 
-  const flattenUrls = updateData.images.flatMap((urlString) =>
-    urlString.split(",").map((url) => url.trim())
-  );
-
+  // Parse JSON strings from form data
+  const images = JSON.parse(formData.get("images") as string);
   const dailyDetails = JSON.parse(formData.get("dailyDetails") as string);
+  const categories = JSON.parse(formData.get("categories") as string);
 
   try {
     await prisma.travelPackage.update({
       where: { id: packageId },
       data: {
-        ...updateData,
-        images: flattenUrls,
+        name: updateData.name,
+        durationInDays: updateData.durationInDays,
+        departureFrom: updateData.departureFrom,
+        arrival: updateData.arrival,
+        overview: updateData.overview,
+        price: BigInt(updateData.price),
+        images,
         dailyDetails,
-        price:(updateData.price),
-        isFeatured: submission.value.isFeatured === true ? true : false,
+        categories,
+        isFeatured: updateData.isFeatured ?? false,
       },
     });
   } catch (error) {

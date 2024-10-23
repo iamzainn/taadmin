@@ -23,9 +23,16 @@ import { SubmitButton } from "./SubmitButtons";
 import { travelPackageSchema } from "@/lib/zodSchema";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { JsonValue } from "@prisma/client/runtime/library";
-
 import { deleteImage, editPackage } from "@/action";
 import { Switch } from "./ui/switch";
+
+const PACKAGE_CATEGORIES = [
+  "Student Adventure Tours",
+  "Hot Deals Tours",
+  "Luxury Travel Packages",
+  "Religious/Pilgrimage Tours",
+  "Honeymoon Packages",
+] as const;
 
 interface EditTravelFormProps {
   data: {
@@ -39,24 +46,27 @@ interface EditTravelFormProps {
     dailyDetails: JsonValue;
     overview: string;
     isFeatured: boolean;
+    categories: string[];
     createdAt: Date;
     updatedAt: Date;
   };
 }
+
 export function EditForm({ data }: EditTravelFormProps) {
   const [images, setImages] = useState<string[]>(data.images);
   const [dailyDetails, setDailyDetails] = useState<string[]>(
     data.dailyDetails as string[]
+  );
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    data.categories
   );
   const [lastResult, action] = useFormState(editPackage, null);
 
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      // console.log(formData + "onvalidate")
       return parseWithZod(formData, { schema: travelPackageSchema });
     },
-
     shouldValidate: "onBlur",
     shouldRevalidate: "onInput",
     defaultValue: {
@@ -67,8 +77,21 @@ export function EditForm({ data }: EditTravelFormProps) {
       isFeatured: data.isFeatured,
       price: data.price.toString(),
       overview: data.overview,
+      categories: data.categories,
     },
   });
+
+  const handleCategoryChange = (category: string) => {
+    if (!selectedCategories.includes(category)) {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  const removeCategory = (categoryToRemove: string) => {
+    setSelectedCategories(
+      selectedCategories.filter((cat) => cat !== categoryToRemove)
+    );
+  };
 
   useEffect(() => {
     const durationValue = parseInt(fields.durationInDays.value || "1", 10);
@@ -96,7 +119,6 @@ export function EditForm({ data }: EditTravelFormProps) {
 
   const handleDelete = async (imageUrl: string) => {
     const result = await deleteImage(imageUrl);
-
     if (result.status === "success") {
       setImages((prev) => prev.filter((url) => url !== imageUrl));
     }
@@ -183,22 +205,75 @@ export function EditForm({ data }: EditTravelFormProps) {
                 />
               </div>
             ))}
-
-            <div className="flex flex-col gap-3">
-              <Label>Featured Product</Label>
-              <Switch
-                key={fields.isFeatured.key}
-                name={fields.isFeatured.name}
-                defaultChecked={data.isFeatured}
-              />
-              <p className="text-red-500">{fields.isFeatured.errors}</p>
-            </div>
             <input
               type="hidden"
               name={fields.dailyDetails.name}
               value={JSON.stringify(dailyDetails)}
             />
             <p className="text-red-500">{fields.dailyDetails.errors}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label>Featured Product</Label>
+            <Switch
+              key={fields.isFeatured.key}
+              name={fields.isFeatured.name}
+              defaultChecked={data.isFeatured}
+            />
+            <p className="text-red-500">{fields.isFeatured.errors}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label>Package Categories</Label>
+            <div className="space-y-4">
+              <div className="flex flex-wrap gap-2 mb-2">
+                {selectedCategories.map((category) => (
+                  <div
+                    key={category}
+                    className="flex items-center gap-1 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm"
+                  >
+                    {category}
+                    <button
+                      type="button"
+                      onClick={() => removeCategory(category)}
+                      className="hover:bg-primary/20 rounded-full p-1"
+                    >
+                      <XIcon className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {selectedCategories.length < PACKAGE_CATEGORIES.length && (
+                <select
+                  className="w-full rounded-md border border-input bg-background px-3 py-2"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value) {
+                      handleCategoryChange(value);
+                      e.target.value = "";
+                    }
+                  }}
+                  value=""
+                >
+                  <option value="">Select a category</option>
+                  {PACKAGE_CATEGORIES.filter(
+                    (cat) => !selectedCategories.includes(cat)
+                  ).map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <input
+                type="hidden"
+                name={fields.categories.name}
+                value={JSON.stringify(selectedCategories)}
+              />
+            </div>
+            <p className="text-red-500">{fields.categories.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -228,7 +303,7 @@ export function EditForm({ data }: EditTravelFormProps) {
             <Label>Images</Label>
             <input
               type="hidden"
-              value={images.join(",")}
+              value={JSON.stringify(images)}
               name={fields.images.name}
             />
             {images.length > 0 ? (

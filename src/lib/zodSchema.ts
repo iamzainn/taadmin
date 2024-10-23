@@ -9,8 +9,6 @@ export const bannerSchema = z.object({
 });
 
 
-
-
 export const travelPackageSchema = z.object({
   name: z.string().min(1, "Package name is required"),
   durationInDays: z.number().min(1, "Duration must be at least 1 day"),
@@ -23,8 +21,6 @@ export const travelPackageSchema = z.object({
   categories: z.array(z.string()).min(1, "At least one category is required"),
   price: z.number().min(1, "Price must be at least 1"),
 });
-
-
 
 
 export const visaSchema = z.object({
@@ -68,7 +64,6 @@ export const umrahPackageSchema = z.object({
   Quad_Price: z.number().min(1, "Price must be at least 1"),
   Sharing_Price: z.number().min(1, "Price must be at least 1"),
   Triple_Price: z.number().min(1, "Price must be at least 1"),  
-
   image: z.string().optional(),
   inclusions: z.array(z.string()).min(1, "At least one inclusion is required"),
 });

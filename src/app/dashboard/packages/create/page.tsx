@@ -36,7 +36,9 @@ export default function CreateTravelPackagePage() {
   const [images, setImages] = useState<string[]>([]);
   const [dailyDetails, setDailyDetails] = useState<string[]>([""]);
   const [lastResult, action] = useFormState(createTravelPackage, undefined);
-  const [selectedCategories,setSelectedCategories] = useState<string []>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [price, setPrice] = useState<string>("");
+  const [overview, setOverview] = useState<string>("");
 
   const handleCategoryChange = (category: string) => {
     if (!selectedCategories.includes(category)) {
@@ -115,6 +117,31 @@ export default function CreateTravelPackagePage() {
               placeholder="Enter package name"
             />
             <p className="text-red-500">{fields.name.errors}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.price.id}>Price</Label>
+            <Input
+              id={fields.price.id}
+              name={fields.price.name}
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="Enter package price"
+            />
+            <p className="text-red-500">{fields.price.errors}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.overview.id}>Overview</Label>
+            <Textarea
+              id={fields.overview.id}
+              name={fields.overview.name}
+              value={overview}
+              onChange={(e) => setOverview(e.target.value)}
+              placeholder="Enter package overview"
+            />
+            <p className="text-red-500">{fields.overview.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -209,7 +236,7 @@ export default function CreateTravelPackagePage() {
                 <select
                   className="w-full rounded-md border border-input bg-background px-3 py-2"
                   onChange={(e) => {
-                    const value = e.target.value
+                    const value = e.target.value;
                     if (value) {
                       handleCategoryChange(value);
                       e.target.value = ""; // Reset select after selection
@@ -241,10 +268,8 @@ export default function CreateTravelPackagePage() {
             <Label>Images</Label>
             <input
               type="hidden"
-              value={images}
-              key={fields.images.key}
+              value={JSON.stringify(images)}
               name={fields.images.name}
-              defaultValue={fields.images.initialValue as undefined}
             />
             {images.length > 0 ? (
               <div className="flex gap-5">
@@ -270,8 +295,6 @@ export default function CreateTravelPackagePage() {
             ) : (
               <UploadDropzone
                 endpoint="packageImageRoute"
-                // className="object-cover border rounded-lg bg-gray-600 flex items-center justify-center"
-
                 onClientUploadComplete={(res) => {
                   setImages(res.map((r) => r.url));
                 }}
