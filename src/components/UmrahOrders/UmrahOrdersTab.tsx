@@ -4,6 +4,8 @@ import UmrahPackageSubscriptions from "./UmrahPackageSubscriptions";
 import CustomUmrahOrders from "./CustomUmrahTabs";
 
 export default function UmrahOrderTabs() {
+  console.log("UmrahOrderTabs")
+
   return (
     <Tabs defaultValue="customOrders">
       <TabsList>

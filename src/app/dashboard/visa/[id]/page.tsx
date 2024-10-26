@@ -9,9 +9,7 @@ async function getData(visaId: string) {
       id: visaId,
     },
 
-    include:{
-        Agent: true
-    }
+   
     }
 
   );
@@ -22,10 +20,7 @@ async function getData(visaId: string) {
 
   return {
   id:data.id,
-  agentName:data.Agent.name,
-  agentEmail:data.Agent.email,
-  agentId:data.agentId,
-  agentPhone:data.Agent.phone,
+ 
   countryName: data.countryName,
   description: data.description,
   pricing: data.pricing,

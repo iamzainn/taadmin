@@ -20,22 +20,18 @@ import { parseWithZod } from "@conform-to/zod";
 import { ChevronLeft, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useFormState } from "react-dom";
 import { deleteImage, editVisa } from "@/action";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 import { unstable_noStore as noStore } from "next/cache";
 
-interface Agent {
-  id: string;
-  name: string;
-}
+
 
 interface VisaEditFormProps {
   data: {
     id: string;
-    agentId: string;
     countryName: string;
     description: string;
     pricing: number;
@@ -48,7 +44,7 @@ interface VisaEditFormProps {
 export default function VisaEditForm({ data }: VisaEditFormProps) {
   noStore();
   const [images, setImages] = useState<string[]>(data.images);
-  const [agents, setAgents] = useState<Agent[]>([]);
+
   const [, action] = useFormState(editVisa, undefined);
 
   const [form, fields] = useForm({
@@ -64,29 +60,11 @@ export default function VisaEditForm({ data }: VisaEditFormProps) {
       pricing: data.pricing.toString(),
       requiredDocuments: data.requiredDocuments,
       visaValidity: data.visaValidity.toString(),
-      agentId: data.agentId,
+     
     },
   });
 
-  useEffect(() => {
-    const fetchAgents = async () => {
-      try {
-        const response = await fetch("/api/agents", {
-          cache: "no-store",
-        })
-        if (response.ok) {
-          const data = await response.json();
-          console.log(data);
-          setAgents(data);
-        } else {
-          console.error("Failed to fetch agents:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error fetching agents:", error);
-      }
-    };
-    fetchAgents();
-  }, []);
+  
 
   const handleDelete = async (imageUrl: string) => {
     const result = await deleteImage(imageUrl);
@@ -183,24 +161,7 @@ export default function VisaEditForm({ data }: VisaEditFormProps) {
               )}
             </div>
 
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="agentId">Agent</Label>
-              <Select name={fields.agentId.name} defaultValue={data.agentId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an agent" />
-                </SelectTrigger>
-                <SelectContent>
-                  {agents.map((agent) => (
-                    <SelectItem key={agent.id} value={agent.id}>
-                      {agent.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {fields.agentId.errors && (
-                <p className="text-red-500">{fields.agentId.errors}</p>
-              )}
-            </div>
+            
 
             <div className="flex flex-col gap-3">
               <Label>Images</Label>

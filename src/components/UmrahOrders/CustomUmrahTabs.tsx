@@ -1,8 +1,10 @@
 import { getCustomUmrahOrders } from '@/lib/dataFetching'
 
-import { DataTableCustomUmrah } from './DataTableCustomUmrah'
+// import { DataTableCustomUmrah } from './DataTableCustomUmrah'
 import { unstable_noStore } from 'next/cache'
-import Pagination from '../TravelOrders/Pagination'
+import { DataTableCustomUmrah } from './DataTableCustomUmrah';
+import Pagination from '../TravelOrders/Pagination';
+// import Pagination from '../TravelOrders/Pagination'
 
 type SearchParams = { [key: string]: string | string[] | undefined }
 
@@ -13,13 +15,14 @@ export default async function CustomUmrahOrders({
 }) {
   unstable_noStore();
   const page = typeof searchParams.page === 'string' ? Number(searchParams.page) : 1
-  const { orders, totalPages } = await getCustomUmrahOrders(page)
+  const  data = await getCustomUmrahOrders(page)
+  // console.log(JSON.stringify(data?.orders))
 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Custom Umrah Orders</h2>
-      <DataTableCustomUmrah data={orders} />
-      {totalPages > 1 && <Pagination totalPages={totalPages} />}
+     {data?.orders ? <DataTableCustomUmrah data={data.orders} /> : <p>No orders found</p>}
+      { data.totalPages > 1  && <Pagination totalPages={data?.totalPages} />}
     </div>
   )
 }

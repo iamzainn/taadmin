@@ -51,20 +51,21 @@ export async function getCustomUmrahOrders(page: number) {
   const skip = (page - 1) * pageSize;
 
   try {
-    const [orders, totalCount] = await Promise.all([
-      prisma.customUmrahPackages.findMany({
+ 
+
+
+   const [orders,totalCount]= await Promise.all([
+      prisma.customUmrahPackage.findMany({
         skip,
         take: pageSize,
         orderBy: { createdAt: 'desc' },
-      }),
-      prisma.customUmrahPackages.count(),
-    ]);
 
-    return { 
-      orders, 
-      totalCount, 
-      totalPages: Math.ceil(totalCount / pageSize) 
-    };
+      }),
+      prisma.customUmrahPackage.count(),
+    ])
+    return {
+      orders,totalCount,totalPages:Math.ceil(totalCount / pageSize)
+    }
   } catch (error) {
     console.error("Error fetching custom Umrah orders:", error);
     throw new Error("Failed to fetch custom Umrah orders");

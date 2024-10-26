@@ -22,15 +22,15 @@ export function DataTableCustomTravel({ data }: DataTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>First Name</TableHead>
-            <TableHead>Last Name</TableHead>
+            <TableHead>Name</TableHead>
+            
             <TableHead>Email</TableHead>
             <TableHead>Phone Number</TableHead>
             <TableHead>Country</TableHead>
-            <TableHead>Pick Up Location</TableHead>
+            
             <TableHead>Destination</TableHead>
-            <TableHead>Travel Start Date</TableHead>
-            <TableHead>Travel End Date</TableHead>
+            <TableHead>FORM FILL DATE</TableHead>
+           
             
           </TableRow>
         </TableHeader>
@@ -39,15 +39,15 @@ export function DataTableCustomTravel({ data }: DataTableProps) {
             data.map((booking) => (
               <TableRow key={booking.id}>
                 
-                <TableCell>{booking.firstName}</TableCell>
-                <TableCell>{booking.lastName}</TableCell>
+                <TableCell>{booking.name}</TableCell>
+                
                 <TableCell>{booking.email}</TableCell>
                 <TableCell>{booking.phoneNumber}</TableCell>
                 <TableCell>{booking.country}</TableCell>
-                <TableCell>{booking.pickUpLocation}</TableCell>
                 <TableCell>{booking.Destination}</TableCell>
-                <TableCell>{format(new Date(booking.travelStartDate), 'PP')}</TableCell>
-                <TableCell>{format(new Date(booking.travelEndDate), 'PP')}</TableCell>
+               
+                <TableCell>{format(new Date(booking.createdAt), 'PP')}</TableCell>
+                
                 
               </TableRow>
             ))

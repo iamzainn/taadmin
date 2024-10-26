@@ -10,15 +10,15 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { UmrahPackageSubscription, UmrahPackage } from "@prisma/client"
-import { Button } from "@/components/ui/button"
-import DetailsDialog from "./DetailsDialog"
+// import { Button } from "@/components/ui/button"
+
 
 interface DataTableProps {
   data: (UmrahPackageSubscription & { UmrahPackage: UmrahPackage })[]
 }
 
 export function DataTableUmrahSubscription({ data }: DataTableProps) {
-  const [selectedItem, setSelectedItem] = React.useState<(UmrahPackageSubscription & { UmrahPackage: UmrahPackage }) | null>(null);
+  // const [selectedItem, setSelectedItem] = React.useState<(UmrahPackageSubscription & { UmrahPackage: UmrahPackage }) | null>(null);
 
   return (
     <>
@@ -32,7 +32,7 @@ export function DataTableUmrahSubscription({ data }: DataTableProps) {
               <TableHead>Phone Number</TableHead>
               <TableHead>Country</TableHead>
               <TableHead>Package Name</TableHead>
-              <TableHead>Actions</TableHead>
+              {/* <TableHead>Actions</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -45,9 +45,9 @@ export function DataTableUmrahSubscription({ data }: DataTableProps) {
                   <TableCell>{subscription.phoneNumber}</TableCell>
                   <TableCell>{subscription.country}</TableCell>
                   <TableCell>{subscription.UmrahPackage.title}</TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     <Button onClick={() => setSelectedItem(subscription)}>View Details</Button>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               ))
             ) : (
@@ -60,7 +60,7 @@ export function DataTableUmrahSubscription({ data }: DataTableProps) {
           </TableBody>
         </Table>
       </div>
-      <DetailsDialog item={selectedItem} onClose={() => setSelectedItem(null)} />
+      
     </>
   )
 }
