@@ -32,7 +32,7 @@ export const ourFileRouter = {
      
       return { uploadedBy: metadata.userId };
     }),
-    packageImageRoute: f({ image: { maxFileSize: "4MB",maxFileCount:5 } })
+    packageImageRoute: f({ image: { maxFileSize: "1MB",maxFileCount:5 } })
     // Set permissions and file types for this FileRoute
     .middleware(async ({ }) => {
   
@@ -54,7 +54,7 @@ export const ourFileRouter = {
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId };
     }),
-    visaImageRoute: f({ image: { maxFileSize: "4MB",maxFileCount:5 } })
+    visaImageRoute: f({ image: { maxFileSize: "1MB",maxFileCount:5 } })
     // Set permissions and file types for this FileRoute
     .middleware(async ({ }) => {
   
@@ -76,7 +76,7 @@ export const ourFileRouter = {
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
       return { uploadedBy: metadata.userId };
     }),
-    umrahImageRoute: f({ image: { maxFileSize: "4MB",maxFileCount:1 } })
+    umrahImageRoute: f({ image: { maxFileSize: "1MB",maxFileCount:1 } })
     // Set permissions and file types for this FileRoute
     .middleware(async ({ }) => {
   
