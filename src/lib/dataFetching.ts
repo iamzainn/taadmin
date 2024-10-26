@@ -100,5 +100,31 @@ export async function getUmrahPackageSubscriptions(page: number) {
 
 
 
+export async function getVisaOrders(page: number) {
+  const pageSize = 10;
+  const skip = (page - 1) * pageSize;
+
+  try {
+    const [orders, totalCount] = await Promise.all([
+      prisma.visaOrder.findMany({
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.visaOrder.count(),
+    ]);
+
+    return { 
+      orders, 
+      totalCount, 
+      totalPages: Math.ceil(totalCount / pageSize) 
+    };
+  } catch (error) {
+    console.error("Error fetching visa orders:", error);
+    throw new Error("Failed to fetch visa orders");
+  }
+}
+
+
 
 

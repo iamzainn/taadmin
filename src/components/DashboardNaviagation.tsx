@@ -33,6 +33,11 @@ const links = [
    {
     name:"Umrah Orders",
     href:"/dashboard/UmrahOrders"
+   },
+   {
+    name:'Visa Orders',
+    href:"/dashboard/VisaOrders"
+
    }
 ];
 
