@@ -1,5 +1,5 @@
 
-// import { deleteBanner } from "@/actions";
+
 import { deleteBanner } from "@/action";
 import { SubmitButton } from "@/components/SubmitButtons";
 import { Button } from "@/components/ui/button";

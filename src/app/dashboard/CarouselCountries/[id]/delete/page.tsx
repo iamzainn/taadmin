@@ -1,6 +1,6 @@
 
 
-import { deleteTravelPackage } from "@/action";
+import { deleteCarouselCountry} from "@/action";
 import { SubmitButton } from "@/components/SubmitButtons";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,30 +10,30 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import prisma from "@/lib/db";
+// import prisma from "@/lib/db";
 import { unstable_noStore } from "next/cache";
 import Link from "next/link";
 
 
-async function getData(packageId: string) {
-  const data = await prisma.travelPackage.findUnique({
-    where: {
-      id: packageId,
-    },
-    select: {
-        images: true,
-        // arrival: true
-    }
-  });
+// async function getData(Id: string) {
+//   const data = await prisma.countries.findUnique({
+//     where: {
+//       id:Id,
+//     },
+//     select: {
+//         id: true,
+//         // name: true,
+//     }
+//   });
 
-  return data;
+//   return data;
 
-}
+// }
 
 export default async function DeleteRoute({ params }: { params: { id: string } }) {
 
   unstable_noStore(); 
-  const data = await getData(params.id);
+//   const data = await getData(params.id);
   return (
     <div className="h-[80vh] w-full flex items-center justify-center">
       <Card className="max-w-xl">
@@ -46,13 +46,11 @@ export default async function DeleteRoute({ params }: { params: { id: string } }
         </CardHeader>
         <CardFooter className="w-full flex justify-between">
           <Button variant="secondary" asChild>
-            <Link href="/dashboard/packages">Cancel</Link>
+            <Link href="/dashboard/CarouselCountries">Cancel</Link>
           </Button>
-          <form action={deleteTravelPackage}>
-            <input type="hidden" name="packageId" value={params.id} />
-            <input type="hidden" name="images" value={(data?.images)} />
-            {/* <input type="hidden" name="arrival" value={(data?.arrival)} /> */}
-            <SubmitButton variant="destructive" text="Delete Product" />
+          <form action={deleteCarouselCountry}>
+            <input type="hidden" name="id" value={params.id} />
+            <SubmitButton variant="destructive" text="Delete Country" />
           </form>
         </CardFooter>
       </Card>

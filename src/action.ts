@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { parseWithZod } from "@conform-to/zod";
-import {  ActionResult, agentSchema, bannerSchema, umrahPackageSchema, visaSchema} from "../src/lib/zodSchema";
+import {  ActionResult, agentSchema, bannerSchema, countriesSchema, umrahPackageSchema, visaSchema} from "../src/lib/zodSchema";
 import prisma from "./lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { UTApi } from "uploadthing/server";
@@ -11,6 +11,16 @@ import { revalidatePath } from "next/cache";
 
 
 const utapi = new UTApi();
+
+
+// const findCountryExist = async (country: string) => {
+
+//   return await prisma.countries.findFirst({
+//     where: {
+//       name: country
+//     }
+//   })
+// }
 
 
 export async function createBanner(prevState: unknown, formData: FormData) {
@@ -99,6 +109,18 @@ export async function createBanner(prevState: unknown, formData: FormData) {
         categories,
       },
     });
+
+    // if(!await findCountryExist(submission.value.arrival)){
+    //   try {
+    //     await prisma.countries.create({
+    //       data: {
+    //         name: submission.value.arrival
+    //       }
+    //     })
+    //   } catch (error) {
+        
+    //   }
+    // }
     
     revalidatePath("/dashboard/packages");
     redirect("/dashboard/packages");
@@ -109,7 +131,7 @@ export async function deleteTravelPackage(formData: FormData) {
   if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
 
   const packageId = formData.get("packageId") as string;
-  console.log(packageId)
+  // const arrival = formData.get("arrival") as string;
   const images=formData.get("images") as string;
     const arrayImages = images.split(",")
 
@@ -122,6 +144,9 @@ export async function deleteTravelPackage(formData: FormData) {
       id: packageId,
     },
   });
+
+
+ 
 
   revalidatePath("/dashboard/packages");
   redirect("/dashboard/packages");
@@ -143,7 +168,7 @@ export async function editPackage(prevState: unknown, formData: FormData) {
   const packageId = formData.get("packageId") as string;
   const { ...updateData } = submission.value;
 
-  // Parse JSON strings from form data
+  
   const images = JSON.parse(formData.get("images") as string);
   const dailyDetails = JSON.parse(formData.get("dailyDetails") as string);
   const categories = JSON.parse(formData.get("categories") as string);
@@ -419,7 +444,7 @@ revalidatePath("/dashboard/visa");
 
 
   export async function editUmrahPackage(prevState: unknown, formData: FormData) {
-    console.log("editUmrahPackage")
+    // console.log("editUmrahPackage")
     const user = await currentUser()
     if (!user ) throw new Error("Unauthorized");
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
@@ -433,7 +458,7 @@ revalidatePath("/dashboard/visa");
     }
   
     const packageId = formData.get("packageId") as string;
-    console.log(packageId)
+    // console.log(packageId)
 
     const  a = (submission.value.inclusions[0].split(",")).map((url) => url.replace("[",'').replace("]",''))
     
@@ -492,3 +517,90 @@ revalidatePath("/dashboard/visa");
     revalidatePath("/dashboard/umrah-packages");
     redirect("/dashboard/umrah-packages");
   }
+
+
+  export const createCarouselCountry = async ( formData: FormData) => {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
+
+    const submission = parseWithZod(formData, {
+      schema:   countriesSchema,
+    });
+
+    if (submission.status !== "success") {
+      return submission.reply();
+    }
+
+    await prisma.countries.create({
+      data: {
+        name: submission.value.name,
+        // image: submission.value.image,
+      },
+    });
+
+
+    revalidatePath("/dashboard/CarouselCountries");
+    redirect("/dashboard/CarouselCountries");
+  }
+
+  export const updateCarouselCountry = async ( formData: FormData) => {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
+
+
+    const id = formData.get("id") as string;
+    const submission = parseWithZod(formData, {
+      schema:   countriesSchema,
+    });
+
+    if (submission.status !== "success") {
+      return submission.reply();
+    }
+
+    await prisma.countries.update({
+      where: { id },
+      data: {
+        name: submission.value.name,
+        // image: submission.value.image,
+      },
+    });
+
+
+    revalidatePath("/dashboard/CarouselCountries");
+    redirect("/dashboard/CarouselCountries");
+  }
+
+  export const deleteCarouselCountry = async ( formData: FormData) => {
+    const user = await currentUser();
+    if (!user || user.publicMetadata.role !== "admin") {
+      throw new Error("Unauthorized");
+    }
+
+
+    const id = formData.get("id") as string;
+
+    console.log("id : ",id)
+   
+    try {
+      await prisma.countries.delete({
+        where: { id },
+      })
+          
+      
+
+      
+    } catch (error) {
+      console.error("Failed to create country:", error);
+      return { status: 'error', message: "Failed to create countries" };
+    }
+
+   
+  
+    revalidatePath("/dashboard/CarouselCountries");
+    redirect("/dashboard/CarouselCountries");
+  };
+  

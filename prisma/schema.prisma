@@ -55,13 +55,20 @@ model TravelCustomBooking {
   createdAt   DateTime @default(now())
 }
 
+// making @id to name and id combine
+
 model Countries {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  imageString String
+   
+ 
+
 }
+
+
+
 
 model Visa {
   id                String   @id @default(cuid())

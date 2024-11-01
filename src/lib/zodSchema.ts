@@ -71,3 +71,10 @@ export const umrahPackageSchema = z.object({
 
 
 export type UmrahPackageSchemaType = z.infer<typeof umrahPackageSchema>;
+
+
+export const countriesSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+});
+
+export type CountrySchema = z.infer<typeof countriesSchema>;
