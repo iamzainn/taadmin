@@ -25,7 +25,7 @@ import { ChevronLeft, XIcon } from "lucide-react";
 import { unstable_noStore as noStore } from "next/cache";
 import Image from "next/image";
 import Link from "next/link";
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import { useFormState } from "react-dom";
 
 
@@ -49,22 +49,22 @@ export default function VisaCreateRoute() {
     shouldRevalidate: "onInput",
   });
 
-  // useEffect(() => {
-  //   const fetchAgents = async () => {
-  //     const response = await fetch("/api/agents", {
-  //       cache: "no-store",
-  //     });
-  //     console.log(response)
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log(data);
+  useEffect(() => {
+    const fetchAgents = async () => {
+      const response = await fetch("/api/agents", {
+        cache: "no-store",
+      });
+      console.log(response)
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
         
-  //       setAgents(data);
-  //     }
-  //   };
+        // setAgents(data);
+      }
+    };
 
-  //   fetchAgents();
-  // }, []);
+    fetchAgents();
+  }, []);
 
   const handleDelete = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
