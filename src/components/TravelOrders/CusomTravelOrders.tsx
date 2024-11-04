@@ -1,21 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import { DestinationFilter } from './DestinationFilter';
 import { DataTableCustomTravel } from './DataTableCustomTravel';
-import { useSearchParams } from 'next/navigation';
-import { DateRangeFilter } from '../DateRangeFilter';
 
-export interface TravelOrder {
-  id: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  country: string;
-  Destination: string;
-  createdAt: string;
-  // Add other fields as per your schema
-}
+import { useSearchParams } from 'next/navigation';
+import { TravelOrder } from '@/lib/types';
+import { TableActions } from '../TableActions';
+import { DateRangeFilter } from '../DateRangeFilter';
 
 export default function CustomTravelOrders() {
   const searchParams = useSearchParams();
@@ -23,31 +15,39 @@ export default function CustomTravelOrders() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`/api/orders?${searchParams.toString()}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch orders');
-        }
-        const data = await response.json();
-        setOrders(data.orders || []); // Assuming the API returns { orders: [] }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch orders');
-        console.error('Error fetching orders:', err);
-      } finally {
-        setIsLoading(false);
+  const fetchOrders = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/orders?${searchParams.toString()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch orders');
       }
-    };
+      const data = await response.json();
+      console.log("data : " ,data);
+      setOrders(data.orders || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch orders');
+      console.error('Error fetching orders:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [searchParams]);
 
+  useEffect(() => {
     fetchOrders();
-  }, [searchParams]); // This will re-fetch when filters change
+  }, [fetchOrders]);
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Custom Travel Orders</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Custom Travel Orders</h2>
+        <TableActions 
+          onRefresh={fetchOrders}
+          data={orders}
+          tableType="orders"
+        />
+      </div>
       <div className="space-y-4 mb-6">
         <div className="flex gap-4">
           <DestinationFilter />

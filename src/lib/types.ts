@@ -29,3 +29,15 @@ export interface DateRange {
     TravelPackage: TravelPackage;
     // Add other fields as per your schema
   }
+
+  export interface TravelOrder {
+    id: string;
+    name: string;
+    email: string;
+    phoneNumber: string;
+    country: string;
+    Destination: string;
+    createdAt: string;
+    
+  }
+  

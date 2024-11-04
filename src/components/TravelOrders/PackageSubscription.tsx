@@ -1,10 +1,13 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { DateRangeFilter } from '../DateRangeFilter';
+import { useEffect, useState, useCallback } from 'react';
+
 import { DestinationFilter } from './DestinationFilter';
 import { DataTablePackageSubscription } from './DataTablePackageSubscription';
+
 import { useSearchParams } from 'next/navigation';
-import { PackageSubscription } from '@/lib/types'
+import { PackageSubscription } from '@/lib/types';
+import { TableActions } from '../TableActions';
+import { DateRangeFilter } from '../DateRangeFilter';
 
 export default function PackageSubscriptions() {
   const searchParams = useSearchParams();
@@ -12,32 +15,42 @@ export default function PackageSubscriptions() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchSubscriptions = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`/api/subscriptions?${searchParams.toString()}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch subscriptions');
-        }
-        const data = await response.json();
-        console.log(data);
-        setSubscriptions(data.subscriptions || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch subscriptions');
-        console.error('Error fetching subscriptions:', err);
-      } finally {
-        setIsLoading(false);
+  const fetchSubscriptions = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/subscriptions?${searchParams.toString()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch subscriptions');
       }
-    };
-
-    fetchSubscriptions();
+      const data = await response.json();
+      if (data.success) {
+        setSubscriptions(data.subscriptions);
+      } else {
+        throw new Error(data.error || 'Failed to fetch subscriptions');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch subscriptions');
+      console.error('Error fetching subscriptions:', err);
+    } finally {
+      setIsLoading(false);
+    }
   }, [searchParams]);
+
+  useEffect(() => {
+    fetchSubscriptions();
+  }, [fetchSubscriptions]);
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Travel Packages Customer Subscription</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">Travel Packages Customer Subscription</h2>
+        <TableActions 
+          onRefresh={fetchSubscriptions}
+          data={subscriptions}
+          tableType="subscriptions"
+        />
+      </div>
       <div className="space-y-4 mb-6">
         <div className="flex gap-4">
           <DestinationFilter />
