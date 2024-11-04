@@ -1,48 +1,76 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { Prisma } from '@prisma/client';
+
+// Helper function to handle BigInt serialization
+const serializeData = (data: unknown) => {
+  return JSON.parse(
+    JSON.stringify(
+      data,
+      (key, value) => (typeof value === 'bigint' ? value.toString() : value)
+    )
+  );
+};
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const destination = searchParams.get('destination') || undefined;
-  const startDate = searchParams.get('startDate');
-  const endDate = searchParams.get('endDate');
-
-  let whereClause = {};
-
-  if (destination) {
-    whereClause = {
-      ...whereClause,
-      TravelPackage: {
-        destination: {
-          contains: destination,
-          mode: 'insensitive',
-        },
-      },
-    };
-  }
-
-  if (startDate && endDate) {
-    whereClause = {
-      ...whereClause,
-      createdAt: {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
-      },
-    };
-  }
-
   try {
+    const { searchParams } = new URL(request.url);
+    const destination = searchParams.get('destination');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+
+    // Build where clause step by step
+    let whereClause: Prisma.PackageSubscriptionWhereInput = {};
+
+    // Add destination filter if provided
+    if (destination) {
+      whereClause = {
+        TravelPackage: {
+          arrival: {
+            contains: destination,
+            mode: 'insensitive',
+          }
+        },
+      };
+    }
+
+    // Add date range filter if both dates are provided
+    if (startDate && endDate) {
+      whereClause = {
+        ...whereClause,
+        createdAt: {
+          gte: new Date(startDate + 'T00:00:00.000Z'),
+          lte: new Date(endDate + 'T23:59:59.999Z'),
+        },
+      };
+    }
+
     const subscriptions = await prisma.packageSubscription.findMany({
       where: whereClause,
-      orderBy: { createdAt: 'desc' },
-      include: { TravelPackage: true },
+      include: {
+        TravelPackage: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
-    return NextResponse.json({ subscriptions });
+    // Serialize the data to handle BigInt values
+    const serializedSubscriptions = serializeData(subscriptions);
+
+    return NextResponse.json({
+      subscriptions: serializedSubscriptions,
+      success: true,
+    });
+
   } catch (error) {
-    console.error("Error fetching subscriptions:", error);
+    console.error("Detailed error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch subscriptions' },
+      {
+        error: 'Failed to fetch subscriptions',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        success: false,
+      },
       { status: 500 }
     );
   }

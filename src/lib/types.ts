@@ -14,7 +14,7 @@ export interface DateRange {
   export interface TravelPackage {
     id: string;
     name: string;
-    destination: string;
+    arrival: string;
     // Add other fields as per your schema
   }
   

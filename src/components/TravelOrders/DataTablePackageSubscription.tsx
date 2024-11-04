@@ -39,7 +39,7 @@ export function DataTablePackageSubscription({ data }: DataTableProps) {
                 <TableCell>{subscription.phoneNumber}</TableCell>
                 <TableCell>{subscription.country}</TableCell>
                 <TableCell>{subscription.TravelPackage.name}</TableCell>
-                <TableCell>{subscription.TravelPackage.destination}</TableCell>
+                <TableCell>{subscription.TravelPackage.arrival}</TableCell>
               </TableRow>
             ))
           ) : (

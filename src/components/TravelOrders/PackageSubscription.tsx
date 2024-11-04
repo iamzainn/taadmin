@@ -22,6 +22,7 @@ export default function PackageSubscriptions() {
           throw new Error('Failed to fetch subscriptions');
         }
         const data = await response.json();
+        console.log(data);
         setSubscriptions(data.subscriptions || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch subscriptions');
