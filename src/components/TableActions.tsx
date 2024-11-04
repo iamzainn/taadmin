@@ -1,12 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client';
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { RefreshCcw, Download } from "lucide-react";
 import * as XLSX from 'xlsx';
+import { TravelOrder, PackageSubscription } from '@/lib/types';
 
 interface TableActionsProps {
   onRefresh: () => Promise<void>;
-  data: any[];
+  data: TravelOrder[] | PackageSubscription[];
   tableType: 'orders' | 'subscriptions';
 }
 
@@ -29,8 +32,9 @@ export function TableActions({ onRefresh, data, tableType }: TableActionsProps) 
     let fileName = '';
 
     if (tableType === 'orders') {
-      // Format data for custom travel orders
-      worksheetData = data.map(order => ({
+      // Type assertion to tell TypeScript this is definitely TravelOrder[]
+      const orderData = data as TravelOrder[];
+      worksheetData = orderData.map(order => ({
         'Name': order.name,
         'Email': order.email,
         'Phone Number': order.phoneNumber,
@@ -40,8 +44,9 @@ export function TableActions({ onRefresh, data, tableType }: TableActionsProps) 
       }));
       fileName = `travel-orders-${new Date().toISOString().split('T')[0]}`;
     } else {
-      // Format data for package subscriptions
-      worksheetData = data.map(subscription => ({
+      // Type assertion to tell TypeScript this is definitely PackageSubscription[]
+      const subscriptionData = data as PackageSubscription[];
+      worksheetData = subscriptionData.map(subscription => ({
         'First Name': subscription.firstName,
         'Last Name': subscription.lastName,
         'Email': subscription.email,
