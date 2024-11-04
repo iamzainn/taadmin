@@ -9,11 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { TravelCustomBooking } from "@prisma/client"
+
 import { format } from "date-fns"
+import { TravelOrder } from "@/lib/types"
 
 interface DataTableProps {
-  data: TravelCustomBooking[]
+  data: TravelOrder[]
 }
 
 export function DataTableCustomTravel({ data }: DataTableProps) {
@@ -23,11 +24,9 @@ export function DataTableCustomTravel({ data }: DataTableProps) {
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            
             <TableHead>Email</TableHead>
             <TableHead>Phone Number</TableHead>
             <TableHead>Country</TableHead>
-            
             <TableHead>Destination</TableHead>
             <TableHead>Order</TableHead>
            
@@ -37,15 +36,12 @@ export function DataTableCustomTravel({ data }: DataTableProps) {
         <TableBody>
           {data.length > 0 ? (
             data.map((booking) => (
-              <TableRow key={booking.id}>
-                
+              <TableRow key={booking.id}>          
                 <TableCell>{booking.name}</TableCell>
-                
                 <TableCell>{booking.email}</TableCell>
                 <TableCell>{booking.phoneNumber}</TableCell>
                 <TableCell>{booking.country}</TableCell>
                 <TableCell>{booking.Destination}</TableCell>
-               
                 <TableCell>{format(new Date(booking.createdAt), 'PP')}</TableCell>
                 
                 

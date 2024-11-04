@@ -24,7 +24,7 @@ export default function CustomTravelOrders() {
         throw new Error('Failed to fetch orders');
       }
       const data = await response.json();
-      console.log("data : " ,data);
+      
       setOrders(data.orders || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch orders');
