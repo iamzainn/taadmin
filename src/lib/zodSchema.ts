@@ -17,11 +17,12 @@ export const travelPackageSchema = z.object({
   dailyDetails: z.array(z.string().min(1, "Daily detail is required")).min(1, "At least one daily detail is required"),
   overview: z.string().min(10, "Overview must be at least 10 characters long"),
   images: z.array(z.string()).min(1, "At least one image is required"),
-  isFeatured : z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
   categories: z.array(z.string()).min(1, "At least one category is required"),
   price: z.number().min(1, "Price must be at least 1"),
+  includes: z.array(z.string()).default([]),
+  excludes: z.array(z.string()).default([])
 });
-
 
 export const visaSchema = z.object({
   countryName: z.string().min(1, "Country name is required"),

@@ -34,6 +34,7 @@ const PACKAGE_CATEGORIES = [
   "Honeymoon Packages",
 ] as const;
 
+
 interface EditTravelFormProps {
   data: {
     id: string;
@@ -47,6 +48,9 @@ interface EditTravelFormProps {
     overview: string;
     isFeatured: boolean;
     categories: string[];
+    includes: string[];    // New field
+    excludes: string[];    // New field
+    numberOfNights: number; // New field
     createdAt: Date;
     updatedAt: Date;
   };
@@ -54,6 +58,11 @@ interface EditTravelFormProps {
 
 export function EditForm({ data }: EditTravelFormProps) {
   const [images, setImages] = useState<string[]>(data.images);
+  const [includes, setIncludes] = useState<string[]>(data.includes);
+const [excludes, setExcludes] = useState<string[]>(data.excludes);
+const [newInclude, setNewInclude] = useState<string>("");
+const [newExclude, setNewExclude] = useState<string>("");
+
   const [dailyDetails, setDailyDetails] = useState<string[]>(
     data.dailyDetails as string[]
   );
@@ -78,6 +87,8 @@ export function EditForm({ data }: EditTravelFormProps) {
       price: data.price.toString(),
       overview: data.overview,
       categories: data.categories,
+      includes: data.includes,    // New field
+      excludes: data.excludes, 
     },
   });
 
@@ -85,6 +96,27 @@ export function EditForm({ data }: EditTravelFormProps) {
     if (!selectedCategories.includes(category)) {
       setSelectedCategories([...selectedCategories, category]);
     }
+  };
+  const handleAddInclude = () => {
+    if (newInclude.trim()) {
+      setIncludes([...includes, newInclude.trim()]);
+      setNewInclude("");
+    }
+  };
+  
+  const handleAddExclude = () => {
+    if (newExclude.trim()) {
+      setExcludes([...excludes, newExclude.trim()]);
+      setNewExclude("");
+    }
+  };
+  
+  const removeInclude = (indexToRemove: number) => {
+    setIncludes(includes.filter((_, index) => index !== indexToRemove));
+  };
+  
+  const removeExclude = (indexToRemove: number) => {
+    setExcludes(excludes.filter((_, index) => index !== indexToRemove));
   };
 
   const removeCategory = (categoryToRemove: string) => {
@@ -298,6 +330,84 @@ export function EditForm({ data }: EditTravelFormProps) {
             />
             <p className="text-red-500">{fields.price.errors}</p>
           </div>
+          <div className="flex flex-col gap-3">
+  <Label>Package Includes</Label>
+  <div className="space-y-4">
+    <div className="flex flex-wrap gap-2 mb-2">
+      {includes.map((item, index) => (
+        <div
+          key={index}
+          className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm"
+        >
+          {item}
+          <button
+            type="button"
+            onClick={() => removeInclude(index)}
+            className="hover:bg-green-200 rounded-full p-1"
+          >
+            <XIcon className="w-3 h-3" />
+          </button>
+        </div>
+      ))}
+    </div>
+    
+    <div className="flex gap-2">
+      <Input
+        value={newInclude}
+        onChange={(e) => setNewInclude(e.target.value)}
+        placeholder="Add new include item"
+        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddInclude())}
+      />
+      <Button type="button" onClick={handleAddInclude}>Add</Button>
+    </div>
+    
+    <input
+      type="hidden"
+      name={fields.includes.name}
+      value={JSON.stringify(includes)}
+    />
+  </div>
+</div>
+
+{/* Excludes Section */}
+<div className="flex flex-col gap-3">
+  <Label>Package Excludes</Label>
+  <div className="space-y-4">
+    <div className="flex flex-wrap gap-2 mb-2">
+      {excludes.map((item, index) => (
+        <div
+          key={index}
+          className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
+        >
+          {item}
+          <button
+            type="button"
+            onClick={() => removeExclude(index)}
+            className="hover:bg-red-200 rounded-full p-1"
+          >
+            <XIcon className="w-3 h-3" />
+          </button>
+        </div>
+      ))}
+    </div>
+    
+    <div className="flex gap-2">
+      <Input
+        value={newExclude}
+        onChange={(e) => setNewExclude(e.target.value)}
+        placeholder="Add new exclude item"
+        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddExclude())}
+      />
+      <Button type="button" onClick={handleAddExclude}>Add</Button>
+    </div>
+    
+    <input
+      type="hidden"
+      name={fields.excludes.name}
+      value={JSON.stringify(excludes)}
+    />
+  </div>
+</div>
 
           <div className="flex flex-col gap-3">
             <Label>Images</Label>

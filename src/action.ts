@@ -79,7 +79,7 @@ export async function createBanner(prevState: unknown, formData: FormData) {
 
   export async function createTravelPackage(prevState: unknown, formData: FormData) {
     const user = await currentUser()
-    if (!user ) throw new Error("Unauthorized");
+    if (!user) throw new Error("Unauthorized");
     
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
   
@@ -94,12 +94,18 @@ export async function createBanner(prevState: unknown, formData: FormData) {
     const dailyDetails = JSON.parse(formData.get("dailyDetails") as string);
     const categories = JSON.parse(formData.get('categories') as string);
     const images = JSON.parse(formData.get('images') as string);
+    const includes = JSON.parse(formData.get('includes') as string);
+    const excludes = JSON.parse(formData.get('excludes') as string);
+    
+    // Calculate number of nights (duration - 1)
+    const numberOfNights = submission.value.durationInDays - 1;
   
     await prisma.travelPackage.create({
       data: {
         name: submission.value.name,
         price: BigInt(submission.value.price),
         durationInDays: submission.value.durationInDays,
+        numberOfNights,
         departureFrom: submission.value.departureFrom,
         arrival: submission.value.arrival,
         dailyDetails,
@@ -107,23 +113,13 @@ export async function createBanner(prevState: unknown, formData: FormData) {
         images,
         isFeatured: submission.value.isFeatured ?? false,
         categories,
+        includes,
+        excludes,
       },
     });
 
-    // if(!await findCountryExist(submission.value.arrival)){
-    //   try {
-    //     await prisma.countries.create({
-    //       data: {
-    //         name: submission.value.arrival
-    //       }
-    //     })
-    //   } catch (error) {
-        
-    //   }
-    // }
-    
-    revalidatePath("/dashboard/packages");
-    redirect("/dashboard/packages");
+  revalidatePath("/dashboard/packages");
+  redirect("/dashboard/packages");
   }
 export async function deleteTravelPackage(formData: FormData) {
   const user = await currentUser();
@@ -168,10 +164,14 @@ export async function editPackage(prevState: unknown, formData: FormData) {
   const packageId = formData.get("packageId") as string;
   const { ...updateData } = submission.value;
 
-  
   const images = JSON.parse(formData.get("images") as string);
   const dailyDetails = JSON.parse(formData.get("dailyDetails") as string);
   const categories = JSON.parse(formData.get("categories") as string);
+  const includes = JSON.parse(formData.get("includes") as string);
+  const excludes = JSON.parse(formData.get("excludes") as string);
+  
+  // Calculate number of nights
+  const numberOfNights = updateData.durationInDays - 1;
 
   try {
     await prisma.travelPackage.update({
@@ -179,6 +179,7 @@ export async function editPackage(prevState: unknown, formData: FormData) {
       data: {
         name: updateData.name,
         durationInDays: updateData.durationInDays,
+        numberOfNights,
         departureFrom: updateData.departureFrom,
         arrival: updateData.arrival,
         overview: updateData.overview,
@@ -186,6 +187,8 @@ export async function editPackage(prevState: unknown, formData: FormData) {
         images,
         dailyDetails,
         categories,
+        includes,
+        excludes,
         isFeatured: updateData.isFeatured ?? false,
       },
     });
