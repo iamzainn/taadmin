@@ -24,6 +24,7 @@ export default function PackageSubscriptions() {
         throw new Error('Failed to fetch subscriptions');
       }
       const data = await response.json();
+      console.log("date subscription :",data)
       if (data.success) {
         setSubscriptions(data.subscriptions);
       } else {

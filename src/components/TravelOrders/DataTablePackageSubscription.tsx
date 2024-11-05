@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { PackageSubscription } from '@/lib/types';
+import { format } from "date-fns";
 
 interface DataTableProps {
   data: PackageSubscription[];
@@ -25,6 +26,7 @@ export function DataTablePackageSubscription({ data }: DataTableProps) {
             <TableHead>Email</TableHead>
             <TableHead>Phone Number</TableHead>
             <TableHead>Country</TableHead>
+            <TableHead>Order Date</TableHead>
             <TableHead>Package Name</TableHead>
             <TableHead>Destination</TableHead>
           </TableRow>
@@ -38,6 +40,7 @@ export function DataTablePackageSubscription({ data }: DataTableProps) {
                 <TableCell>{subscription.email}</TableCell>
                 <TableCell>{subscription.phoneNumber}</TableCell>
                 <TableCell>{subscription.country}</TableCell>
+                <TableCell>{format(new Date(subscription.createdAt), 'PP')}</TableCell>
                 <TableCell>{subscription.TravelPackage.name}</TableCell>
                 <TableCell>{subscription.TravelPackage.arrival}</TableCell>
               </TableRow>
