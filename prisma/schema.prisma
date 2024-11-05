@@ -121,7 +121,8 @@ model UmrahPackage {
   Triple_Price             BigInt
   Double_Price             BigInt
   image                    String?
-  inclusions               String[]
+  includes                 String[]                   @default([])  // Changed from inclusions
+  excludes                 String[]                   @default([])  // New field
   createdAt                DateTime                   @default(now())
   updatedAt                DateTime                   @updatedAt
   UmrahPackageSubscription UmrahPackageSubscription[]

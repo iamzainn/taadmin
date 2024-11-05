@@ -16,7 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
-import { ChevronLeft, XIcon, PlusCircle } from "lucide-react";
+import { ChevronLeft, XIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -28,7 +28,11 @@ import { SubmitButton } from "@/components/SubmitButtons";
 
 export default function CreateUmrahPackagePage() {
   const [image, setImage] = useState<string | null>(null);
-  const [inclusions, setInclusions] = useState<string[]>([""]);
+  const [includes, setIncludes] = useState<string[]>([]);
+  const [excludes, setExcludes] = useState<string[]>([]);
+  const [newInclude, setNewInclude] = useState<string>("");
+  const [newExclude, setNewExclude] = useState<string>("");
+
   const [lastResult, action] = useFormState(createUmrahPackage, undefined);
 
   const [form, fields] = useForm({
@@ -40,20 +44,26 @@ export default function CreateUmrahPackagePage() {
     shouldRevalidate: "onInput",
   });
 
-  const handleInclusionChange = (index: number, value: string) => {
-    setInclusions(prevInclusions => {
-      const newInclusions = [...prevInclusions];
-      newInclusions[index] = value;
-      return newInclusions;
-    });
+  const handleAddInclude = () => {
+    if (newInclude.trim()) {
+      setIncludes([...includes, newInclude.trim()]);
+      setNewInclude("");
+    }
   };
 
-  const addInclusion = () => {
-    setInclusions(prev => [...prev, ""]);
+  const handleAddExclude = () => {
+    if (newExclude.trim()) {
+      setExcludes([...excludes, newExclude.trim()]);
+      setNewExclude("");
+    }
   };
 
-  const removeInclusion = (index: number) => {
-    setInclusions(prev => prev.filter((_, i) => i !== index));
+  const removeInclude = (indexToRemove: number) => {
+    setIncludes(includes.filter((_, index) => index !== indexToRemove));
+  };
+
+  const removeExclude = (indexToRemove: number) => {
+    setExcludes(excludes.filter((_, index) => index !== indexToRemove));
   };
 
   return (
@@ -218,40 +228,86 @@ export default function CreateUmrahPackagePage() {
          
 
           <div className="flex flex-col gap-3">
-            <Label>Package Inclusions</Label>
-            {inclusions.map((inclusion, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  value={inclusion}
-                  onChange={(e) => handleInclusionChange(index, e.target.value)}
-                  placeholder={`Inclusion ${index + 1}`}
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => removeInclusion(index)}
-                >
-                  <XIcon className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addInclusion}
-              className="flex items-center gap-2"
+      <Label>Package Includes</Label>
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-2 mb-2">
+          {includes.map((item, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm"
             >
-              <PlusCircle className="h-4 w-4" /> Add Inclusion
-            </Button>
-            <input
-              type="hidden"
-              name={fields.inclusions.name}
-              value={JSON.stringify(inclusions)}
-            />
-            <p className="text-red-500">{fields.inclusions.errors}</p>
-          </div>
+              {item}
+              <button
+                type="button"
+                onClick={() => removeInclude(index)}
+                className="hover:bg-green-200 rounded-full p-1"
+              >
+                <XIcon className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+        
+        <div className="flex gap-2">
+          <Input
+            value={newInclude}
+            onChange={(e) => setNewInclude(e.target.value)}
+            placeholder="Add new include item"
+            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddInclude())}
+          />
+          <Button type="button" onClick={handleAddInclude}>Add</Button>
+        </div>
+        
+        <input
+          type="hidden"
+          name={fields.includes.name}
+          value={JSON.stringify(includes)}
+        />
+        <p className="text-red-500">{fields.includes.errors}</p>
+      </div>
+    </div>
+
+    {/* Package Excludes */}
+    <div className="flex flex-col gap-3">
+      <Label>Package Excludes</Label>
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-2 mb-2">
+          {excludes.map((item, index) => (
+            <div
+              key={index}
+              className="flex items-center gap-1 bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm"
+            >
+              {item}
+              <button
+                type="button"
+                onClick={() => removeExclude(index)}
+                className="hover:bg-red-200 rounded-full p-1"
+              >
+                <XIcon className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+        
+        <div className="flex gap-2">
+          <Input
+            value={newExclude}
+            onChange={(e) => setNewExclude(e.target.value)}
+            placeholder="Add new exclude item"
+            onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddExclude())}
+          />
+          <Button type="button" onClick={handleAddExclude}>Add</Button>
+        </div>
+        
+        <input
+          type="hidden"
+          name={fields.excludes.name}
+          value={JSON.stringify(excludes)}
+        />
+        <p className="text-red-500">{fields.excludes.errors}</p>
+      </div>
+    </div>
+          
 
           <div className="flex flex-col gap-3">
             <Label>Package Image</Label>

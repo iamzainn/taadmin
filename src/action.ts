@@ -403,51 +403,43 @@ revalidatePath("/dashboard/visa");
     if (!user || user.publicMetadata.role !== "admin") {
       throw new Error("Unauthorized");
     }
-
+  
     const submission = parseWithZod(formData, {
       schema: umrahPackageSchema,
     });
     
     if (submission.status !== "success") {
       return submission.reply();
-
     }
-    const  a = (submission.value.inclusions[0].split(",")).map((url) => url.replace("[",'').replace("]",''))
-   
-   
-      
-      
-        await prisma.umrahPackage.create({
-          data: {
-            title: submission.value.title,
-            description: submission.value.description,
-            hotelMakkah: submission.value.hotelMakkah,
-            hotelMakkahRating: Number(submission.value.hotelMakkahRating),
-            hotelMadinah: submission.value.hotelMadinah,
-            hotelMadinahRating: Number(submission.value.hotelMadinahRating),
-            nightsInMakkah: Number(submission.value.nightsInMakkah),
-            nightsInMadinah: Number(submission.value.nightsInMadinah),
-            inclusions: a,
-            Double_Price: Number(submission.value.Double_Price),
-            Quad_Price: Number(submission.value.Quad_Price),
-            Sharing_Price: Number(submission.value.Sharing_Price),
-            Triple_Price: Number(submission.value.Triple_Price),
-            image: submission.value.image,
-
-          },
-        });
-        
-        
-        revalidatePath("/dashboard/umrah-packages");
-        redirect("/dashboard/umrah-packages");
   
-    
-    
+    const includes = JSON.parse(formData.get("includes") as string);
+    const excludes = JSON.parse(formData.get("excludes") as string);
+  
+    await prisma.umrahPackage.create({
+      data: {
+        title: submission.value.title,
+        description: submission.value.description,
+        hotelMakkah: submission.value.hotelMakkah,
+        hotelMakkahRating: Number(submission.value.hotelMakkahRating),
+        hotelMadinah: submission.value.hotelMadinah,
+        hotelMadinahRating: Number(submission.value.hotelMadinahRating),
+        nightsInMakkah: Number(submission.value.nightsInMakkah),
+        nightsInMadinah: Number(submission.value.nightsInMadinah),
+        includes,
+        excludes,
+        Double_Price: BigInt(submission.value.Double_Price),
+        Quad_Price: BigInt(submission.value.Quad_Price),
+        Sharing_Price: BigInt(submission.value.Sharing_Price),
+        Triple_Price: BigInt(submission.value.Triple_Price),
+        image: submission.value.image,
+      },
+    });
+        
+    revalidatePath("/dashboard/umrah-packages");
+    redirect("/dashboard/umrah-packages");
   }
 
-
   export async function editUmrahPackage(prevState: unknown, formData: FormData) {
-    // console.log("editUmrahPackage")
     const user = await currentUser()
     if (!user ) throw new Error("Unauthorized");
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
@@ -461,29 +453,37 @@ revalidatePath("/dashboard/visa");
     }
   
     const packageId = formData.get("packageId") as string;
-    // console.log(packageId)
-
-    const  a = (submission.value.inclusions[0].split(",")).map((url) => url.replace("[",'').replace("]",''))
-    
-    // console.log(a)
-    
-  
     const { ...updateData } = submission.value;
-
+  
+    const includes = JSON.parse(formData.get("includes") as string);
+    const excludes = JSON.parse(formData.get("excludes") as string);
   
     try {
       await prisma.umrahPackage.update({
         where: { id: packageId },
         data: {
-          ...updateData,
-          inclusions: a,
+          title: updateData.title,
+          description: updateData.description,
+          hotelMakkah: updateData.hotelMakkah,
+          hotelMakkahRating: Number(updateData.hotelMakkahRating),
+          hotelMadinah: updateData.hotelMadinah,
+          hotelMadinahRating: Number(updateData.hotelMadinahRating),
+          nightsInMakkah: Number(updateData.nightsInMakkah),
+          nightsInMadinah: Number(updateData.nightsInMadinah),
+          Double_Price: BigInt(updateData.Double_Price),
+          Quad_Price: BigInt(updateData.Quad_Price),
+          Sharing_Price: BigInt(updateData.Sharing_Price),
+          Triple_Price: BigInt(updateData.Triple_Price),
+          image: updateData.image,
+          includes,
+          excludes,
         },
       });
     } catch (error) {
-      return { error: { "": ["Failed to update travel package"] } };
+      return { error: { "": ["Failed to update Umrah package"] } };
     }
-    // console.log("redirecting")
-    revalidatePath("/dashboard/umrah-packages"); 
+  
+    revalidatePath("/dashboard/umrah-packages");
     redirect("/dashboard/umrah-packages");
   }
 
