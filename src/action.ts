@@ -79,7 +79,7 @@ export async function createBanner(prevState: unknown, formData: FormData) {
 
   export async function createTravelPackage(prevState: unknown, formData: FormData) {
     const user = await currentUser()
-    if (!user) throw new Error("Unauthorized");
+    if (!user ) throw new Error("Unauthorized");
     
     if(user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
   
@@ -97,8 +97,12 @@ export async function createBanner(prevState: unknown, formData: FormData) {
     const includes = JSON.parse(formData.get('includes') as string);
     const excludes = JSON.parse(formData.get('excludes') as string);
     
-    // Calculate number of nights (duration - 1)
+    // Calculate number of nights and isActive
     const numberOfNights = submission.value.durationInDays - 1;
+    const validFrom = new Date(submission.value.validFrom);
+    const validUntil = new Date(submission.value.validUntil);
+    const now = new Date();
+    const isActive = now >= validFrom && now <= validUntil;
   
     await prisma.travelPackage.create({
       data: {
@@ -115,10 +119,13 @@ export async function createBanner(prevState: unknown, formData: FormData) {
         categories,
         includes,
         excludes,
+        validFrom,
+        validUntil,
+        isActive,
       },
     });
 
-  revalidatePath("/dashboard/packages");
+    revalidatePath("/dashboard/packages");
   redirect("/dashboard/packages");
   }
 export async function deleteTravelPackage(formData: FormData) {
@@ -169,9 +176,13 @@ export async function editPackage(prevState: unknown, formData: FormData) {
   const categories = JSON.parse(formData.get("categories") as string);
   const includes = JSON.parse(formData.get("includes") as string);
   const excludes = JSON.parse(formData.get("excludes") as string);
-  
-  // Calculate number of nights
+
+  // Calculate number of nights and isActive status
   const numberOfNights = updateData.durationInDays - 1;
+  const validFrom = new Date(updateData.validFrom);
+  const validUntil = new Date(updateData.validUntil);
+  const now = new Date();
+  const isActive = now >= validFrom && now <= validUntil;
 
   try {
     await prisma.travelPackage.update({
@@ -190,6 +201,9 @@ export async function editPackage(prevState: unknown, formData: FormData) {
         includes,
         excludes,
         isFeatured: updateData.isFeatured ?? false,
+        validFrom,
+        validUntil,
+        isActive,
       },
     });
   } catch (error) {

@@ -23,7 +23,7 @@ model TravelPackage {
   updatedAt           DateTime              @updatedAt
   dailyDetails        Json                  @default("[]")
   durationInDays      Int
-  numberOfNights      Int                   // This will be auto-calculated
+  numberOfNights      Int
   overview            String
   images              String[]
   arrival             String
@@ -32,6 +32,9 @@ model TravelPackage {
   categories          String[]              @default([])
   includes            String[]              @default([])
   excludes            String[]              @default([])
+  validFrom           DateTime              // New field: start date
+  validUntil          DateTime              // New field: end date
+  isActive            Boolean               @default(false) // New field: active status
   PackageSubscription PackageSubscription[]
 }
 

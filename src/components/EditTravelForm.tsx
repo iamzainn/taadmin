@@ -48,9 +48,11 @@ interface EditTravelFormProps {
     overview: string;
     isFeatured: boolean;
     categories: string[];
-    includes: string[];    // New field
-    excludes: string[];    // New field
-    numberOfNights: number; // New field
+    includes: string[];
+    excludes: string[];
+    validFrom: Date;      // New field
+    validUntil: Date;     // New field
+    isActive: boolean;    // New field
     createdAt: Date;
     updatedAt: Date;
   };
@@ -62,6 +64,12 @@ export function EditForm({ data }: EditTravelFormProps) {
 const [excludes, setExcludes] = useState<string[]>(data.excludes);
 const [newInclude, setNewInclude] = useState<string>("");
 const [newExclude, setNewExclude] = useState<string>("");
+const [startDate, setStartDate] = useState<string>(
+  data.validFrom.toISOString().split('T')[0]
+);
+const [endDate, setEndDate] = useState<string>(
+  data.validUntil.toISOString().split('T')[0]
+);
 
   const [dailyDetails, setDailyDetails] = useState<string[]>(
     data.dailyDetails as string[]
@@ -87,8 +95,10 @@ const [newExclude, setNewExclude] = useState<string>("");
       price: data.price.toString(),
       overview: data.overview,
       categories: data.categories,
-      includes: data.includes,    // New field
-      excludes: data.excludes, 
+      includes: data.includes,
+      excludes: data.excludes,
+      validFrom: data.validFrom.toISOString().split('T')[0],  // New field
+      validUntil: data.validUntil.toISOString().split('T')[0],
     },
   });
 
@@ -307,6 +317,40 @@ const [newExclude, setNewExclude] = useState<string>("");
             </div>
             <p className="text-red-500">{fields.categories.errors}</p>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="flex flex-col gap-3">
+      <Label htmlFor={fields.validFrom.id}>Valid From</Label>
+      <Input
+        id={fields.validFrom.id}
+        name={fields.validFrom.name}
+        type="date"
+        value={startDate}
+        onChange={(e) => {
+          setStartDate(e.target.value);
+          // Reset end date if it's before new start date
+          if (endDate && new Date(endDate) <= new Date(e.target.value)) {
+            setEndDate("");
+          }
+        }}
+        min={new Date().toISOString().split('T')[0]}
+      />
+      <p className="text-red-500">{fields.validFrom.errors}</p>
+    </div>
+
+    <div className="flex flex-col gap-3">
+      <Label htmlFor={fields.validUntil.id}>Valid Until</Label>
+      <Input
+        id={fields.validUntil.id}
+        name={fields.validUntil.name}
+        type="date"
+        value={endDate}
+        onChange={(e) => setEndDate(e.target.value)}
+        min={startDate || new Date().toISOString().split('T')[0]}
+        disabled={!startDate}
+      />
+      <p className="text-red-500">{fields.validUntil.errors}</p>
+    </div>
+  </div>
 
           <div className="flex flex-col gap-3">
             <Label htmlFor={fields.overview.id}>Overview</Label>

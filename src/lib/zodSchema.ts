@@ -20,8 +20,17 @@ export const travelPackageSchema = z.object({
   isFeatured: z.boolean().optional(),
   categories: z.array(z.string()).min(1, "At least one category is required"),
   price: z.number().min(1, "Price must be at least 1"),
-  includes: z.array(z.string()).default([]),
-  excludes: z.array(z.string()).default([])
+  includes: z.array(z.string()).min(1, "At least one include item is required"),
+  excludes: z.array(z.string()).default([]),
+  validFrom: z.string().min(1, "Start date is required"),
+  validUntil: z.string().min(1, "End date is required")
+}).refine((data) => {
+  const startDate = new Date(data.validFrom);
+  const endDate = new Date(data.validUntil);
+  return endDate > startDate;
+}, {
+  message: "End date must be after start date",
+  path: ["validUntil"]
 });
 
 export const visaSchema = z.object({

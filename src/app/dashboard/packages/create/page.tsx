@@ -43,6 +43,8 @@ const [includes, setIncludes] = useState<string[]>([]);
 const [excludes, setExcludes] = useState<string[]>([]);
 const [newInclude, setNewInclude] = useState<string>("");
 const [newExclude, setNewExclude] = useState<string>("");
+const [startDate, setStartDate] = useState<string>("");
+const [endDate, setEndDate] = useState<string>("");
 
 
   const handleCategoryChange = (category: string) => {
@@ -290,6 +292,40 @@ const [newExclude, setNewExclude] = useState<string>("");
             </div>
             <p className="text-red-500">{fields.categories.errors}</p>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div className="flex flex-col gap-3">
+    <Label htmlFor={fields.validFrom.id}>Valid From</Label>
+    <Input
+      id={fields.validFrom.id}
+      name={fields.validFrom.name}
+      type="date"
+      value={startDate}
+      onChange={(e) => {
+        setStartDate(e.target.value);
+        // Reset end date if it's before new start date
+        if (endDate && new Date(endDate) <= new Date(e.target.value)) {
+          setEndDate("");
+        }
+      }}
+      min={new Date().toISOString().split('T')[0]} // Can't select past dates
+    />
+    <p className="text-red-500">{fields.validFrom.errors}</p>
+  </div>
+
+  <div className="flex flex-col gap-3">
+    <Label htmlFor={fields.validUntil.id}>Valid Until</Label>
+    <Input
+      id={fields.validUntil.id}
+      name={fields.validUntil.name}
+      type="date"
+      value={endDate}
+      onChange={(e) => setEndDate(e.target.value)}
+      min={startDate || new Date().toISOString().split('T')[0]} // Can't select date before start date
+      disabled={!startDate} // Can't select end date until start date is selected
+    />
+    <p className="text-red-500">{fields.validUntil.errors}</p>
+  </div>
+</div>
 
           <div className="flex flex-col gap-3">
   <Label>Package Includes</Label>
