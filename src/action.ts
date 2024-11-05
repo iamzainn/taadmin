@@ -620,4 +620,33 @@ revalidatePath("/dashboard/visa");
     revalidatePath("/dashboard/CarouselCountries");
     redirect("/dashboard/CarouselCountries");
   };
+
+
+
+  export async function deleteCustomOrder(id: string) {
+    try {
+      await prisma.travelCustomBooking.delete({
+        where: { id },
+      });
+      revalidatePath('/dashboard/travelOrders'); // Adjust this path to your actual route
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      return { success: false, error: 'Failed to delete order' };
+    }
+  }
+
+
+export async function deletePackageSubscription(id: string) {
+  try {
+    await prisma.packageSubscription.delete({
+      where: { id },
+    });
+    revalidatePath('/dashboard/travelOrders'); // Adjust this path to your actual route
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting subscription:', error);
+    return { success: false, error: 'Failed to delete subscription' };
+  }
+}
   

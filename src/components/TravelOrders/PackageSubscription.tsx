@@ -72,7 +72,7 @@ export default function PackageSubscriptions() {
       )}
 
       {!isLoading && !error && subscriptions.length > 0 && (
-        <DataTablePackageSubscription data={subscriptions} />
+        <DataTablePackageSubscription data={subscriptions}   onDataChange={fetchSubscriptions} />
       )}
     </div>
   );

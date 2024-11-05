@@ -68,7 +68,7 @@ export default function CustomTravelOrders() {
       )}
 
       {!isLoading && !error && orders.length > 0 && (
-        <DataTableCustomTravel data={orders} />
+        <DataTableCustomTravel data={orders}  onDataChange={fetchOrders}  />
       )}
     </div>
   );

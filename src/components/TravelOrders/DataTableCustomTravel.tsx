@@ -12,12 +12,15 @@ import {
 
 import { format } from "date-fns"
 import { TravelOrder } from "@/lib/types"
+import { DeleteButton } from "./DeleteButton"
+import { deleteCustomOrder } from "@/action"
 
 interface DataTableProps {
   data: TravelOrder[]
+  onDataChange: () => void;
 }
 
-export function DataTableCustomTravel({ data }: DataTableProps) {
+export function DataTableCustomTravel({ data ,onDataChange}: DataTableProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -43,7 +46,13 @@ export function DataTableCustomTravel({ data }: DataTableProps) {
                 <TableCell>{booking.country}</TableCell>
                 <TableCell>{booking.Destination}</TableCell>
                 <TableCell>{format(new Date(booking.createdAt), 'PP')}</TableCell>
-                
+                <TableCell>
+                  <DeleteButton
+                    id={booking.id}
+                    onDelete={deleteCustomOrder}
+                    onDeleteSuccess={onDataChange}
+                  />
+                </TableCell>
                 
               </TableRow>
             ))

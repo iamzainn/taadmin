@@ -10,12 +10,15 @@ import {
 } from "@/components/ui/table";
 import { PackageSubscription } from '@/lib/types';
 import { format } from "date-fns";
+import { DeleteButton } from "./DeleteButton";
+import { deletePackageSubscription } from "@/action";
 
 interface DataTableProps {
   data: PackageSubscription[];
+  onDataChange: () => void;
 }
 
-export function DataTablePackageSubscription({ data }: DataTableProps) {
+export function DataTablePackageSubscription({ data ,onDataChange}: DataTableProps) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -43,6 +46,13 @@ export function DataTablePackageSubscription({ data }: DataTableProps) {
                 <TableCell>{format(new Date(subscription.createdAt), 'PP')}</TableCell>
                 <TableCell>{subscription.TravelPackage.name}</TableCell>
                 <TableCell>{subscription.TravelPackage.arrival}</TableCell>
+                <TableCell>
+                  <DeleteButton
+                    id={subscription.id}
+                    onDelete={deletePackageSubscription}
+                    onDeleteSuccess={onDataChange}
+                  />
+                </TableCell>
               </TableRow>
             ))
           ) : (
