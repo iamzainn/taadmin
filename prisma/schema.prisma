@@ -32,9 +32,9 @@ model TravelPackage {
   categories          String[]              @default([])
   includes            String[]              @default([])
   excludes            String[]              @default([])
-  validFrom           DateTime              // New field: start date
-  validUntil          DateTime              // New field: end date
-  isActive            Boolean               @default(false) // New field: active status
+  validFrom           DateTime
+  validUntil          DateTime
+  isActive            Boolean               @default(false)
   PackageSubscription PackageSubscription[]
 }
 
@@ -45,6 +45,7 @@ model PackageSubscription {
   email         String
   phoneNumber   String
   country       String
+  travelDate    DateTime
   createdAt     DateTime      @default(now())
   updatedAt     DateTime
   packageId     String
@@ -61,20 +62,12 @@ model TravelCustomBooking {
   createdAt   DateTime @default(now())
 }
 
-// making @id to name and id combine
-
 model Countries {
-  id          String    @id @default(cuid())
-  name        String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-   
- 
-
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
-
-
-
 
 model Visa {
   id                String   @id @default(cuid())
@@ -124,10 +117,10 @@ model UmrahPackage {
   Triple_Price             BigInt
   Double_Price             BigInt
   image                    String?
-  includes                 String[]                   @default([])  // Changed from inclusions
-  excludes                 String[]                   @default([])  // New field
   createdAt                DateTime                   @default(now())
   updatedAt                DateTime                   @updatedAt
+  excludes                 String[]                   @default([])
+  includes                 String[]                   @default([])
   UmrahPackageSubscription UmrahPackageSubscription[]
 }
 

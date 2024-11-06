@@ -22,5 +22,6 @@ export interface PackageSubscription {
   phoneNumber: string;
   country: string;
   createdAt: string;
+  travelDate: string;
   TravelPackage: TravelPackage;
 }

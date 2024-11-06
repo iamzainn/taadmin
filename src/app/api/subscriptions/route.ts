@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
 import { Prisma } from '@prisma/client';
+export const revalidate = 0
 
 // Helper function to handle BigInt serialization
 const serializeData = (data: unknown) => {

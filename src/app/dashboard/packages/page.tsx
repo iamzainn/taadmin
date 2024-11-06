@@ -68,7 +68,7 @@ export default async function PackagesRoute() {
                 <TableHead>Name</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Duration</TableHead>
-                <TableHead>City</TableHead>
+                <TableHead>Country</TableHead>
                 <TableHead className="text-end">Actions</TableHead>
               </TableRow>
             </TableHeader>

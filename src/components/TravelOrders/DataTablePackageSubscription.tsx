@@ -18,7 +18,9 @@ interface DataTableProps {
   onDataChange: () => void;
 }
 
+
 export function DataTablePackageSubscription({ data ,onDataChange}: DataTableProps) {
+  console.log()
   return (
     <div className="rounded-md border">
       <Table>
@@ -32,6 +34,7 @@ export function DataTablePackageSubscription({ data ,onDataChange}: DataTablePro
             <TableHead>Order Date</TableHead>
             <TableHead>Package Name</TableHead>
             <TableHead>Destination</TableHead>
+            <TableHead>Travel Date</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -46,6 +49,9 @@ export function DataTablePackageSubscription({ data ,onDataChange}: DataTablePro
                 <TableCell>{format(new Date(subscription.createdAt), 'PP')}</TableCell>
                 <TableCell>{subscription.TravelPackage.name}</TableCell>
                 <TableCell>{subscription.TravelPackage.arrival}</TableCell>
+                <TableCell>
+                  {format(new Date(subscription.travelDate), 'PP')}
+                </TableCell>
                 <TableCell>
                   <DeleteButton
                     id={subscription.id}
