@@ -97,7 +97,7 @@ export async function createBanner(prevState: unknown, formData: FormData) {
     const includes = JSON.parse(formData.get('includes') as string);
     const excludes = JSON.parse(formData.get('excludes') as string);
     
-    // Calculate number of nights and isActive
+    
     const numberOfNights = submission.value.durationInDays - 1;
     const validFrom = new Date(submission.value.validFrom);
     const validUntil = new Date(submission.value.validUntil);
@@ -112,9 +112,11 @@ export async function createBanner(prevState: unknown, formData: FormData) {
         numberOfNights,
         departureFrom: submission.value.departureFrom,
         arrival: submission.value.arrival,
+        Country: submission.value.Country,
         dailyDetails,
         overview: submission.value.overview,
         images,
+      
         isFeatured: submission.value.isFeatured ?? false,
         categories,
         includes,
@@ -193,6 +195,7 @@ export async function editPackage(prevState: unknown, formData: FormData) {
         numberOfNights,
         departureFrom: updateData.departureFrom,
         arrival: updateData.arrival,
+        Country: updateData.Country,
         overview: updateData.overview,
         price: BigInt(updateData.price),
         images,

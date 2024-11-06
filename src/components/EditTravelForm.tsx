@@ -50,6 +50,7 @@ interface EditTravelFormProps {
     categories: string[];
     includes: string[];
     excludes: string[];
+    Country: string;
     validFrom: Date;      // New field
     validUntil: Date;     // New field
     isActive: boolean;    // New field
@@ -95,7 +96,9 @@ const [endDate, setEndDate] = useState<string>(
       price: data.price.toString(),
       overview: data.overview,
       categories: data.categories,
+      Country: data.Country,
       includes: data.includes,
+    
       excludes: data.excludes,
       validFrom: data.validFrom.toISOString().split('T')[0],  // New field
       validUntil: data.validUntil.toISOString().split('T')[0],
@@ -229,6 +232,17 @@ const [endDate, setEndDate] = useState<string>(
               placeholder="Enter arrival city"
             />
             <p className="text-red-500">{fields.arrival.errors}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.Country.id}>Arrival Country name</Label>
+            <Input
+              id={fields.Country.id}
+              name={fields.Country.name}
+              defaultValue={fields.Country.initialValue}
+              placeholder="Enter arrival Country name"
+            />
+            <p className="text-red-500">{fields.Country.errors}</p>
           </div>
 
           <div className="flex flex-col gap-3">

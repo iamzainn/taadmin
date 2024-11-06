@@ -23,7 +23,8 @@ export const travelPackageSchema = z.object({
   includes: z.array(z.string()).min(1, "At least one include item is required"),
   excludes: z.array(z.string()).default([]),
   validFrom: z.string().min(1, "Start date is required"),
-  validUntil: z.string().min(1, "End date is required")
+  validUntil: z.string().min(1, "End date is required"),
+  Country: z.string().min(1, "Country is required"),
 }).refine((data) => {
   const startDate = new Date(data.validFrom);
   const endDate = new Date(data.validUntil);

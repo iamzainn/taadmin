@@ -28,6 +28,7 @@ model TravelPackage {
   images              String[]
   arrival             String
   departureFrom       String
+  Country             String
   isFeatured          Boolean
   categories          String[]              @default([])
   includes            String[]              @default([])

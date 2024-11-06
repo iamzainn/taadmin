@@ -208,6 +208,17 @@ const [endDate, setEndDate] = useState<string>("");
           </div>
 
           <div className="flex flex-col gap-3">
+            <Label htmlFor={fields.Country.id}>Arrival City Country name</Label>
+            <Input
+              id={fields.Country.id}
+              name={fields.Country.name}
+              defaultValue={fields.Country.initialValue}
+              placeholder="Enter arrival city"
+            />
+            <p className="text-red-500">{fields.Country.errors}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
             <Label>Daily Details</Label>
             {dailyDetails.map((detail, index) => (
               <div key={index} className="flex flex-col gap-2">
