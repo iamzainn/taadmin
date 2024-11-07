@@ -652,4 +652,31 @@ export async function deletePackageSubscription(id: string) {
     return { success: false, error: 'Failed to delete subscription' };
   }
 }
+
+
+export async function deleteUmrahCustomOrder(id: string) {
+  try {
+    await prisma.customUmrahPackage.delete({
+      where: { id },
+    });
+    revalidatePath('/dashboard/UmrahOrders');
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting Umrah order:', error);
+    return { success: false, error: 'Failed to delete Umrah order' };
+  }
+}
+
+export async function deleteUmrahSubscription(id: string) {
+  try {
+    await prisma.umrahPackageSubscription.delete({
+      where: { id },
+    });
+    revalidatePath('/dashboard/UmrahOrders');
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting Umrah subscription:', error);
+    return { success: false, error: 'Failed to delete Umrah subscription' };
+  }
+}
   
