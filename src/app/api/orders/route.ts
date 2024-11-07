@@ -1,5 +1,7 @@
+// app/api/orders/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+export const revalidate = 0
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -23,8 +25,8 @@ export async function GET(request: Request) {
     whereClause = {
       ...whereClause,
       createdAt: {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
+        gte: new Date(`${startDate}T00:00:00.000Z`),
+        lte: new Date(`${endDate}T23:59:59.999Z`),
       },
     };
   }
@@ -35,7 +37,7 @@ export async function GET(request: Request) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ orders }); // Make sure to return { orders: [...] }
+    return NextResponse.json({ orders });
   } catch (error) {
     console.error("Error fetching orders:", error);
     return NextResponse.json(
