@@ -1,6 +1,7 @@
 // app/api/umrah/orders/route.ts
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 export const fetchCache = 'force-no-store';
@@ -13,21 +14,27 @@ export async function GET(request: Request) {
   const endDate = searchParams.get('endDate');
 
   try {
-    let whereClause: any = {};
+    let whereClause: Prisma.CustomUmrahPackageWhereInput = {};
 
     // Name search filter
     if (name) {
-      whereClause.fullName = {
-        contains: name,
-        mode: 'insensitive',
+      whereClause = {
+        ...whereClause,
+        fullName: {
+          contains: name,
+          mode: 'insensitive',
+        },
       };
     }
 
     // Date range filter
     if (startDate && endDate) {
-      whereClause.createdAt = {
-        gte: new Date(`${startDate}T00:00:00.000Z`),
-        lte: new Date(`${endDate}T23:59:59.999Z`),
+      whereClause = {
+        ...whereClause,
+        createdAt: {
+          gte: new Date(`${startDate}T00:00:00.000Z`),
+          lte: new Date(`${endDate}T23:59:59.999Z`),
+        },
       };
     }
 
@@ -46,7 +53,7 @@ export async function GET(request: Request) {
         durationInDays: true,
         transportNeeded: true,
         createdAt: true,
-      },
+      } satisfies Prisma.CustomUmrahPackageSelect,
     });
 
     return NextResponse.json(
@@ -62,7 +69,10 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error fetching Umrah orders:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch Umrah orders' },
+      { 
+        error: 'Failed to fetch Umrah orders',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }

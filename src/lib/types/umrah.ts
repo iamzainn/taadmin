@@ -11,21 +11,24 @@ export interface CustomUmrahOrder {
     updatedAt: Date;
   }
   
-  export interface UmrahPackageSubscription {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phoneNumber: string;
-    country: string;
-    packageId: string;
-    packagePrice: string; // Type of package price selected
-    createdAt: Date;
-    updatedAt: Date;
-    UmrahPackage: {
-      id: string;
-      title: string;
-    };
-  }
-  
   export type PackagePriceType = 'Sharing' | 'Quad' | 'Triple' | 'Double';
+
+export interface UmrahPackageSubscription {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  country: string;
+  packageId: string;
+  packagePriceType: PackagePriceType;
+  familyMembers: number;
+  travelDate: Date;
+  transportNeeded: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  UmrahPackage: {
+    id: string;
+    title: string;
+  };
+}

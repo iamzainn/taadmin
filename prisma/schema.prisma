@@ -126,16 +126,20 @@ model UmrahPackage {
 }
 
 model UmrahPackageSubscription {
-  id           String       @id
-  firstName    String
-  lastName     String
-  email        String
-  phoneNumber  String
-  country      String
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime
-  packageId    String
-  UmrahPackage UmrahPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  id               String           @id
+  firstName        String
+  lastName         String
+  email            String
+  phoneNumber      String
+  country          String
+  packagePriceType PackagePriceType
+  familyMembers    Int
+  travelDate       DateTime
+  transportNeeded  Boolean          @default(false)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime
+  packageId        String
+  UmrahPackage     UmrahPackage     @relation(fields: [packageId], references: [id], onDelete: Cascade)
 }
 
 model CustomUmrahPackage {
@@ -149,4 +153,11 @@ model CustomUmrahPackage {
   transportNeeded Boolean
   createdAt       DateTime @default(now())
   updatedAt       DateTime
+}
+
+enum PackagePriceType {
+  Sharing
+  Quad
+  Triple
+  Double
 }

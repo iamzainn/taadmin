@@ -1,3 +1,4 @@
+// components/UmrahOrders/DataTableUmrahSubscription.tsx
 'use client';
 
 import {
@@ -8,16 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-// import { 
-//   DropdownMenu,
-//   DropdownMenuContent,
-//   DropdownMenuItem,
-//   DropdownMenuLabel,
-//   DropdownMenuTrigger,
-  
-// } from "@/components/ui/dropdown-menu";
-// import { Button } from "@/components/ui/button";
-// import { MoreHorizontal } from "lucide-react";
+
+import {  Badge, Check, X } from "lucide-react";
 import { UmrahPackageSubscription } from "@/lib/types/umrah";
 import { format } from 'date-fns';
 import { DeleteButton } from "../TravelOrders/DeleteButton";
@@ -30,6 +23,16 @@ interface DataTableUmrahSubscriptionProps {
 }
 
 export function DataTableUmrahSubscription({ data, onDataChange }: DataTableUmrahSubscriptionProps) {
+  const getPackagePriceTypeColor = (type: string) => {
+    const colors = {
+      'Sharing': 'bg-blue-500',
+      'Quad': 'bg-green-500',
+      'Triple': 'bg-purple-500',
+      'Double': 'bg-orange-500'
+    };
+    return colors[type as keyof typeof colors] || 'bg-gray-500';
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -41,20 +44,44 @@ export function DataTableUmrahSubscription({ data, onDataChange }: DataTableUmra
             <TableHead>Country</TableHead>
             <TableHead>Package</TableHead>
             <TableHead>Price Type</TableHead>
-            <TableHead>Subscription Date</TableHead>
+            <TableHead>Family Members</TableHead>
+            <TableHead>Travel Date</TableHead>
+            <TableHead>Transport</TableHead>
+            <TableHead>Booking Date</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((subscription) => (
             <TableRow key={subscription.id}>
-              <TableCell>{`${subscription.firstName} ${subscription.lastName}`}</TableCell>
+              <TableCell className="font-medium">
+                {`${subscription.firstName} ${subscription.lastName}`}
+              </TableCell>
               <TableCell>{subscription.email}</TableCell>
               <TableCell>{subscription.phoneNumber}</TableCell>
               <TableCell>{subscription.country}</TableCell>
               <TableCell>{subscription.UmrahPackage.title}</TableCell>
-              <TableCell>{subscription.packagePrice}</TableCell>
-              <TableCell>{format(new Date(subscription.createdAt), 'MMM dd, yyyy')}</TableCell>
+              <TableCell>
+                <Badge 
+                  className={`${getPackagePriceTypeColor(subscription.packagePriceType)} text-white`}
+                >
+                  {subscription.packagePriceType}
+                </Badge>
+              </TableCell>
+              <TableCell>{subscription.familyMembers}</TableCell>
+              <TableCell>
+                {format(new Date(subscription.travelDate), 'MMM dd, yyyy')}
+              </TableCell>
+              <TableCell>
+                {subscription.transportNeeded ? (
+                  <Check className="h-5 w-5 text-green-500" />
+                ) : (
+                  <X className="h-5 w-5 text-red-500" />
+                )}
+              </TableCell>
+              <TableCell>
+                {format(new Date(subscription.createdAt), 'MMM dd, yyyy')}
+              </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
                   {/* <DropdownMenu>
@@ -65,8 +92,14 @@ export function DataTableUmrahSubscription({ data, onDataChange }: DataTableUmra
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem 
+                        onClick={() => navigator.clipboard.writeText(subscription.id)}
+                      >
+                        Copy Subscription ID
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Export Data</DropdownMenuItem>
+                      <DropdownMenuItem>Export Details</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu> */}
                   <DeleteButton

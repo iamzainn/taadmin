@@ -1,3 +1,4 @@
+// components/UmrahOrders/UmrahTableActions.tsx
 'use client';
 
 import { useState } from 'react';
@@ -5,14 +6,6 @@ import { Button } from "@/components/ui/button";
 import { RefreshCcw, Download } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { CustomUmrahOrder, UmrahPackageSubscription } from '@/lib/types/umrah';
-
-type CellStyle = {
-  fill?: { fgColor: { rgb: string } };
-  font?: { color?: { rgb: string }; bold?: boolean };
-  alignment?: { horizontal: string };
-};
-
-
 
 interface UmrahTableActionsProps {
   onRefresh: () => Promise<void>;
@@ -32,32 +25,11 @@ export function UmrahTableActions({ onRefresh, data, tableType }: UmrahTableActi
     }
   };
 
-  const createExcelStyles = () => {
-    const headerStyle: CellStyle = {
-      fill: { fgColor: { rgb: "4F46E5" } },
-      font: { color: { rgb: "FFFFFF" }, bold: true },
-      alignment: { horizontal: "center" }
-    };
-
-    const highlightedStyle: CellStyle = {
-      fill: { fgColor: { rgb: "EEF2FF" } },
-      font: { color: { rgb: "000000" } }
-    };
-
-    const dateStyle: CellStyle = {
-      font: { color: { rgb: "059669" } },
-      alignment: { horizontal: "center" }
-    };
-
-    return { headerStyle, highlightedStyle, dateStyle };
-  };
-
- 
-
   const handleDownload = () => {
     if (data.length === 0) return;
 
-    let worksheetData: Record<string, string>[] = [];
+    type ExcelRow = Record<string, string | number>;
+    let worksheetData: ExcelRow[] = [];
     let fileName: string;
 
     if (tableType === 'umrahOrders') {
@@ -65,9 +37,9 @@ export function UmrahTableActions({ onRefresh, data, tableType }: UmrahTableActi
         'Full Name': order.fullName,
         'Email': order.email,
         'Phone Number': order.phoneNumber,
-        'Family Members': order.familyMembers.toString(),
+        'Family Members': order.familyMembers,
         'Travel Date': new Date(order.travelDate).toLocaleDateString(),
-        'Duration (Days)': order.durationInDays.toString(),
+        'Duration (Days)': order.durationInDays,
         'Transport Needed': order.transportNeeded ? 'Yes' : 'No',
         'Order Date': new Date(order.createdAt).toLocaleDateString(),
       }));
@@ -87,17 +59,8 @@ export function UmrahTableActions({ onRefresh, data, tableType }: UmrahTableActi
     }
 
     const worksheet = XLSX.utils.json_to_sheet(worksheetData);
-   
-
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data');
-
-    workbook.Props = {
-      Title: fileName,
-      Subject: "Umrah Bookings Data",
-      Author: "Travel Agency",
-      CreatedDate: new Date()
-    };
 
     XLSX.writeFile(workbook, `${fileName}.xlsx`);
   };
