@@ -52,7 +52,7 @@ export function UmrahTableActions({ onRefresh, data, tableType }: UmrahTableActi
         'Phone Number': subscription.phoneNumber,
         'Country': subscription.country,
         'Package Name': subscription.UmrahPackage.title,
-        'Package Price Type': subscription.packagePrice,
+        'Package Price Type': subscription.packagePriceType,
         'Subscription Date': new Date(subscription.createdAt).toLocaleDateString(),
       }));
       fileName = `umrah-subscriptions-${new Date().toISOString().split('T')[0]}`;
