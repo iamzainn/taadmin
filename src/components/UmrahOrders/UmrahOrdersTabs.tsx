@@ -1,11 +1,12 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// components/UmrahOrders/UmrahOrderTabs.tsx
+'use client';
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CustomUmrahOrders from "./CustomUmrahOrders";
 import UmrahPackageSubscriptions from "./UmrahPackageSubscriptions";
-import CustomUmrahOrders from "./CustomUmrahTabs";
+
 
 export default function UmrahOrderTabs() {
-  console.log("UmrahOrderTabs")
-
   return (
     <Tabs defaultValue="customOrders">
       <TabsList>
@@ -14,11 +15,11 @@ export default function UmrahOrderTabs() {
       </TabsList>
 
       <TabsContent value="customOrders">
-        <CustomUmrahOrders searchParams={{}}  />
+        <CustomUmrahOrders />
       </TabsContent>
       
       <TabsContent value="packageSubscriptions">
-        <UmrahPackageSubscriptions searchParams={{}} />
+        <UmrahPackageSubscriptions />
       </TabsContent>
     </Tabs>
   );
