@@ -679,4 +679,38 @@ export async function deleteUmrahSubscription(id: string) {
     return { success: false, error: 'Failed to delete Umrah subscription' };
   }
 }
+
+
+export async function deleteVisaOrder(id: string) {
+  try {
+    await prisma.visaOrder.delete({
+      where: { id },
+    });
+
+    revalidatePath('/dashboard/VisaOrders');
+    return { 
+      success: true 
+    };
+  } catch (error) {
+    console.error('Error deleting visa order:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to delete visa order'
+    };
+  }
+}
+
+// Optional: Helper function to get visa order details
+export async function getVisaOrder(id: string) {
+  try {
+    const order = await prisma.visaOrder.findUnique({
+      where: { id },
+    });
+
+    return order;
+  } catch (error) {
+    console.error('Error fetching visa order:', error);
+    return null;
+  }
+}
   

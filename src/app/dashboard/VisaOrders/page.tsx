@@ -23,7 +23,7 @@ export default function VisaOrdersPage() {
         </CardHeader>
         <CardContent>
           <Suspense fallback={<LoadingSkeleton />}>
-            <VisaOrdersTable searchParams={{}} />
+            <VisaOrdersTable  />
           </Suspense>
         </CardContent>
       </Card>
