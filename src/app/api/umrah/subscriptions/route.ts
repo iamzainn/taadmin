@@ -34,14 +34,13 @@ export async function GET(request: Request) {
         UmrahPackage: {
           title: {
             contains: packageName,
-            
             mode: 'insensitive',
           },
         },
       };
     }
 
-    // Date range filter
+    // Date range filter - inclusive of both start and end dates
     if (startDate && endDate) {
       whereClause = {
         ...whereClause,
@@ -63,44 +62,24 @@ export async function GET(request: Request) {
             title: true,
           },
         },
-      } satisfies Prisma.UmrahPackageSubscriptionInclude,
+      },
     });
 
     return NextResponse.json(
-      { 
-        subscriptions,
-        success: true 
-      },
+      { subscriptions },
       {
         headers: {
-          'Content-Type': 'application/json',
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
           'CDN-Cache-Control': 'no-store',
           'Vercel-CDN-Cache-Control': 'no-store',
-          'Pragma': 'no-cache',
-          'Expires': '0',
         },
       }
     );
   } catch (error) {
     console.error('Error fetching Umrah subscriptions:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to fetch Umrah subscriptions',
-        details: error instanceof Error ? error.message : 'Unknown error',
-        success: false 
-      },
-      { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store'
-        }
-      }
+      { error: 'Failed to fetch Umrah subscriptions' },
+      { status: 500 }
     );
   }
 }
-
-// Types for better type safety
-
-// Helper function for type-safe error responses

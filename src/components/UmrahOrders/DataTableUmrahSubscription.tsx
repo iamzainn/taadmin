@@ -10,7 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import {  Badge, Check, X } from "lucide-react";
 import { UmrahPackageSubscription } from "@/lib/types/umrah";
 import { format } from 'date-fns';
 import { DeleteButton } from "../TravelOrders/DeleteButton";
@@ -23,16 +22,6 @@ interface DataTableUmrahSubscriptionProps {
 }
 
 export function DataTableUmrahSubscription({ data, onDataChange }: DataTableUmrahSubscriptionProps) {
-  const getPackagePriceTypeColor = (type: string) => {
-    const colors = {
-      'Sharing': 'bg-blue-500',
-      'Quad': 'bg-green-500',
-      'Triple': 'bg-purple-500',
-      'Double': 'bg-orange-500'
-    };
-    return colors[type as keyof typeof colors] || 'bg-gray-500';
-  };
-
   return (
     <div className="rounded-md border">
       <Table>
@@ -61,23 +50,13 @@ export function DataTableUmrahSubscription({ data, onDataChange }: DataTableUmra
               <TableCell>{subscription.phoneNumber}</TableCell>
               <TableCell>{subscription.country}</TableCell>
               <TableCell>{subscription.UmrahPackage.title}</TableCell>
-              <TableCell>
-                <Badge 
-                  className={`${getPackagePriceTypeColor(subscription.packagePriceType)} text-white`}
-                >
-                  {subscription.packagePriceType}
-                </Badge>
-              </TableCell>
+              <TableCell>{subscription.packagePriceType}</TableCell>
               <TableCell>{subscription.familyMembers}</TableCell>
               <TableCell>
                 {format(new Date(subscription.travelDate), 'MMM dd, yyyy')}
               </TableCell>
               <TableCell>
-                {subscription.transportNeeded ? (
-                  <Check className="h-5 w-5 text-green-500" />
-                ) : (
-                  <X className="h-5 w-5 text-red-500" />
-                )}
+                {subscription.transportNeeded ? 'Yes' : 'No'}
               </TableCell>
               <TableCell>
                 {format(new Date(subscription.createdAt), 'MMM dd, yyyy')}
@@ -95,7 +74,7 @@ export function DataTableUmrahSubscription({ data, onDataChange }: DataTableUmra
                       <DropdownMenuItem 
                         onClick={() => navigator.clipboard.writeText(subscription.id)}
                       >
-                        Copy Subscription ID
+                        Copy ID
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem>View Details</DropdownMenuItem>
