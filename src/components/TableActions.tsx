@@ -1,8 +1,7 @@
-
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, Download } from "lucide-react";
+import { RefreshCcw, Download, Timer } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { TravelOrder, PackageSubscription } from '@/lib/types';
 
@@ -25,6 +24,7 @@ interface TableActionsProps {
 
 export function TableActions({ onRefresh, data, tableType }: TableActionsProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -35,6 +35,38 @@ export function TableActions({ onRefresh, data, tableType }: TableActionsProps) 
     }
   };
 
+  // Auto-refresh functionality
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const refreshData = () => {
+      if (autoRefreshEnabled && !document.hidden) {
+        handleRefresh();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden && autoRefreshEnabled) {
+        refreshData();
+        // Reset interval when page becomes visible
+        clearInterval(intervalId);
+        intervalId = setInterval(refreshData, 15000);
+      } else {
+        clearInterval(intervalId);
+      }
+    };
+
+    if (autoRefreshEnabled) {
+      intervalId = setInterval(refreshData, 15000);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [autoRefreshEnabled, onRefresh]);
+
   const createExcelStyles = () => {
     const headerStyle: CellStyle = {
       fill: { fgColor: { rgb: "4F46E5" } },
@@ -43,8 +75,18 @@ export function TableActions({ onRefresh, data, tableType }: TableActionsProps) 
     };
 
     const highlightedStyle: CellStyle = {
-      fill: { fgColor: { rgb: "EEF2FF" } },
-      font: { color: { rgb: "000000" } }
+      fill: { fgColor: { rgb: "FCE7F3" } }, // Pink background for highlighted columns
+      font: { color: { rgb: "000000" }, bold: true }
+    };
+
+    const phoneStyle: CellStyle = {
+      fill: { fgColor: { rgb: "DBEAFE" } }, // Blue background for phone numbers
+      font: { color: { rgb: "000000" }, bold: true }
+    };
+
+    const destinationStyle: CellStyle = {
+      fill: { fgColor: { rgb: "DCFCE7" } }, // Green background for destinations
+      font: { color: { rgb: "000000" }, bold: true }
     };
 
     const dateStyle: CellStyle = {
@@ -52,13 +94,14 @@ export function TableActions({ onRefresh, data, tableType }: TableActionsProps) 
       alignment: { horizontal: "center" }
     };
 
-    return { headerStyle, highlightedStyle, dateStyle };
+    return { headerStyle, highlightedStyle, phoneStyle, destinationStyle, dateStyle };
   };
 
   const applyExcelStyles = (worksheet: XLSX.WorkSheet) => {
-    const { headerStyle, highlightedStyle, dateStyle } = createExcelStyles();
+    const { headerStyle, highlightedStyle, phoneStyle, destinationStyle, dateStyle } = createExcelStyles();
     const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
 
+    // Apply header styles
     for (let C = range.s.c; C <= range.e.c; C++) {
       const headerAddress = XLSX.utils.encode_cell({ r: 0, c: C });
       if (!worksheet[headerAddress]) continue;
@@ -72,26 +115,25 @@ export function TableActions({ onRefresh, data, tableType }: TableActionsProps) 
         }))
       : [];
 
+    // Apply cell styles
     for (let R = 1; R <= range.e.r; R++) {
       highlightedColumns.forEach(({ col, header }) => {
         const cellAddress = XLSX.utils.encode_cell({ r: R, c: col });
         if (!worksheet[cellAddress] || !header) return;
 
-        if (
-          header.includes('Phone') ||
-          header.includes('Destination') ||
-          header.includes('Name')
-        ) {
+        if (header.includes('Name')) {
           worksheet[cellAddress].s = highlightedStyle;
-        } else if (
-          header.includes('Date') ||
-          header.includes('Travel')
-        ) {
+        } else if (header.includes('Phone')) {
+          worksheet[cellAddress].s = phoneStyle;
+        } else if (header.includes('Destination')) {
+          worksheet[cellAddress].s = destinationStyle;
+        } else if (header.includes('Date') || header.includes('Travel')) {
           worksheet[cellAddress].s = dateStyle;
         }
       });
     }
 
+    // Calculate and set column widths
     const calculateColWidth = (wsData: unknown[][]): number[] => {
       const widths: number[] = [];
       wsData.forEach(row => {
@@ -158,6 +200,14 @@ export function TableActions({ onRefresh, data, tableType }: TableActionsProps) 
 
   return (
     <div className="flex gap-2">
+      <Button 
+        onClick={() => setAutoRefreshEnabled(!autoRefreshEnabled)} 
+        variant="outline"
+        className={autoRefreshEnabled ? 'bg-green-50' : ''}
+      >
+        <Timer className="h-4 w-4 mr-2" />
+        {autoRefreshEnabled ? 'Auto-refresh On' : 'Auto-refresh Off'}
+      </Button>
       <Button 
         onClick={handleRefresh} 
         variant="outline"
