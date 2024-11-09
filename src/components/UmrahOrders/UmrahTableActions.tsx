@@ -1,9 +1,8 @@
-// components/UmrahOrders/UmrahTableActions.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { RefreshCcw, Download } from "lucide-react";
+import { RefreshCcw, Download, Timer } from "lucide-react";
 import * as XLSX from 'xlsx';
 import { CustomUmrahOrder, UmrahPackageSubscription } from '@/lib/types/umrah';
 
@@ -15,6 +14,7 @@ interface UmrahTableActionsProps {
 
 export function UmrahTableActions({ onRefresh, data, tableType }: UmrahTableActionsProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -24,6 +24,38 @@ export function UmrahTableActions({ onRefresh, data, tableType }: UmrahTableActi
       setIsRefreshing(false);
     }
   };
+
+  // Auto-refresh functionality
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const refreshData = () => {
+      if (autoRefreshEnabled && !document.hidden) {
+        handleRefresh();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (!document.hidden && autoRefreshEnabled) {
+        refreshData();
+        // Reset interval when page becomes visible
+        clearInterval(intervalId);
+        intervalId = setInterval(refreshData, 15000);
+      } else {
+        clearInterval(intervalId);
+      }
+    };
+
+    if (autoRefreshEnabled) {
+      intervalId = setInterval(refreshData, 15000);
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [autoRefreshEnabled, onRefresh]);
 
   const handleDownload = () => {
     if (data.length === 0) return;
@@ -67,6 +99,14 @@ export function UmrahTableActions({ onRefresh, data, tableType }: UmrahTableActi
 
   return (
     <div className="flex gap-2">
+      <Button 
+        onClick={() => setAutoRefreshEnabled(!autoRefreshEnabled)} 
+        variant="outline"
+        className={autoRefreshEnabled ? 'bg-green-50' : ''}
+      >
+        <Timer className="h-4 w-4 mr-2" />
+        {autoRefreshEnabled ? 'Auto-refresh On' : 'Auto-refresh Off'}
+      </Button>
       <Button 
         onClick={handleRefresh} 
         variant="outline"
