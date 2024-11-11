@@ -70,16 +70,28 @@ model Countries {
   updatedAt DateTime @updatedAt
 }
 
+
+
 model Visa {
-  id                String   @id @default(cuid())
+  id                String        @id @default(cuid())
   countryName       String
+  countryId         String       // New field
   images            String[]
-  updatedAt         DateTime @updatedAt
-  createdAt         DateTime @default(now())
+  updatedAt         DateTime      @updatedAt
+  createdAt         DateTime      @default(now())
   description       String
   pricing           Int
   requiredDocuments String
   visaValidity      Int
+  country           VisaCountries @relation(fields: [countryId], references: [id])
+}
+
+model VisaCountries {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  visas     Visa[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model VisaOrder {

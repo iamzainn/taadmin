@@ -234,16 +234,28 @@ export async function createVisa(prevState: unknown, formData: FormData) {
   );
 
   try {
-    await prisma.visa.create({
-      data: {
-        ...submission.value,
-        images: flattenUrls,
-      },
+    await prisma.$transaction(async (tx) => {
+      // First, find or create the country
+      const country = await tx.visaCountries.upsert({
+        where: { name: submission.value.countryName },
+        create: { name: submission.value.countryName },
+        update: {} // No updates needed if exists
+      });
+
+      // Then create the visa with the country reference
+      await tx.visa.create({
+        data: {
+          ...submission.value,
+          images: flattenUrls,
+          countryId: country.id
+        },
+      });
     });
   } catch (error) {
     console.error("Failed to create visa:", error);
     return { message: "Failed to create visa" };
   }
+  
   revalidatePath("/dashboard/visa");
   redirect("/dashboard/visa");
 }
@@ -266,18 +278,60 @@ export async function editVisa(prevState: unknown, formData: FormData) {
   );
 
   try {
-    await prisma.visa.update({
-      where: { id: visaId },
-      data: {
-        ...submission.value,
-        images: flattenUrls,
-      },
+    await prisma.$transaction(async (tx) => {
+      // Get the current visa to check if country changed
+      const currentVisa = await tx.visa.findUnique({
+        where: { id: visaId },
+        select: { countryName: true, countryId: true }
+      });
+
+      if (!currentVisa) throw new Error("Visa not found");
+
+      // If country changed, handle the country update
+      if (currentVisa.countryName !== submission.value.countryName) {
+        // Create or get the new country
+        const newCountry = await tx.visaCountries.upsert({
+          where: { name: submission.value.countryName },
+          create: { name: submission.value.countryName },
+          update: {}
+        });
+
+        // Update the visa with new country
+        await tx.visa.update({
+          where: { id: visaId },
+          data: {
+            ...submission.value,
+            images: flattenUrls,
+            countryId: newCountry.id
+          },
+        });
+
+        // Check if old country has any other visas
+        const oldCountryVisaCount = await tx.visa.count({
+          where: { countryId: currentVisa.countryId }
+        });
+
+        // If no other visas use this country, delete it
+        if (oldCountryVisaCount === 0) {
+          await tx.visaCountries.delete({
+            where: { id: currentVisa.countryId }
+          });
+        }
+      } else {
+        // If country hasn't changed, just update the visa
+        await tx.visa.update({
+          where: { id: visaId },
+          data: {
+            ...submission.value,
+            images: flattenUrls
+          },
+        });
+      }
     });
   } catch (error) {
     console.error("Failed to update visa:", error);
     return { status: "error", message: "Failed to update visa" };
   }
-
 
   revalidatePath("/dashboard/visa");
   redirect("/dashboard/visa");
@@ -308,21 +362,47 @@ export async function editVisa(prevState: unknown, formData: FormData) {
     if (user.publicMetadata.role !== "admin") throw new Error("Unauthorized");
   
     const visaId = formData.get("visaId") as string;
-    const images=formData.get("images") as string;
-    const arrayImages = images.split(",")
-
-    await Promise.all(arrayImages.map(async (image) => {
-      await deleteImage(image)
-    }))
-   
+    const images = formData.get("images") as string;
+    const arrayImages = images.split(",");
   
-    await prisma.visa.delete({
-      where: {
-        id: visaId,
-      },
-    });
+    try {
+      await prisma.$transaction(async (tx) => {
+        // Get the visa to be deleted
+        const visa = await tx.visa.findUnique({
+          where: { id: visaId },
+          select: { countryId: true }
+        });
   
-revalidatePath("/dashboard/visa");
+        if (!visa) throw new Error("Visa not found");
+  
+        // Delete images
+        await Promise.all(arrayImages.map(async (image) => {
+          await deleteImage(image);
+        }));
+  
+        // Delete the visa
+        await tx.visa.delete({
+          where: { id: visaId },
+        });
+  
+        // Check if country has any other visas
+        const countryVisaCount = await tx.visa.count({
+          where: { countryId: visa.countryId }
+        });
+  
+        // If no other visas use this country, delete it
+        if (countryVisaCount === 0) {
+          await tx.visaCountries.delete({
+            where: { id: visa.countryId }
+          });
+        }
+      });
+    } catch (error) {
+      console.error("Failed to delete visa:", error);
+      throw new Error("Failed to delete visa");
+    }
+  
+    revalidatePath("/dashboard/visa");
     redirect("/dashboard/visa");
   }
 
